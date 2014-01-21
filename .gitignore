@@ -1,3 +1,4 @@
-wiki/
+wiki
 .sublime-*
-build/
+build
+node_modules
