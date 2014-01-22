@@ -75,14 +75,13 @@ class Game.TwoWay extends Game.Publisher
     # Crudely extend Game.Observer
     Game.Observer.call @
 
-class Game.Error extends window.Error
+class Game.GameError extends Error
   @ErrorType = {
     NOT_OBJECT: "Cannot add something that isn't a GameObject to the " +
       "current game state."
     ALREADY_ADDED: "Object already added to state."
   }
-  #@:: = window.Error::
   constructor: (message) ->
     @name = 'GameError'
     @message = message
-    @stack = (new window.Error()).stack
+    @stack = (new Error()).stack

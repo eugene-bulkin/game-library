@@ -16,9 +16,9 @@ class Game.State extends Game.TwoWay
     return
   addObject: (obj) ->
     if obj not instanceof Game.Object
-      throw new Game.Error(Game.Error.ErrorType.NOT_OBJECT)
+      throw new Game.GameError(Game.Error.ErrorType.NOT_OBJECT)
     if obj.getId() of @objects
-      throw new Game.Error(Game.Error.ErrorType.ALREADY_ADDED)
+      throw new Game.GameError(Game.Error.ErrorType.ALREADY_ADDED)
     @objects[obj.getId()] = obj
     @listen(obj, @onEvent)
     # call object added method
