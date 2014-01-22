@@ -5,7 +5,7 @@ module.exports = (grunt) ->
     pkg: grunt.file.readJSON('package.json')
     watch: {
       dev: {
-        files: 'src/*.coffee'
+        files: ['src/*.coffee', 'src/compile-order.json']
         tasks: ['build:dev']
       }
       production: {
