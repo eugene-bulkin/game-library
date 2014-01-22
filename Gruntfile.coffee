@@ -78,9 +78,17 @@ module.exports = (grunt) ->
     if 'build' in args then tasks.push 'build:dev'
     tasks.push 'mochaTest'
 
+    allowedReporters = ['nyan', 'spec', 'dot', 'list', 'json', 'markdown', 'min']
+    files = []
     for arg in args
       if arg is 'build' then continue
-      grunt.config.set('mochaTest.test.options.reporter', arg)
+      if arg in allowedReporters
+        grunt.config.set('mochaTest.test.options.reporter', arg)
+      else if grunt.file.exists("test/#{arg}.coffee")
+        files.push "test/#{arg}.coffee"
+
+    if files.length > 0
+      grunt.config.set('mochaTest.test.src', files)
 
     grunt.task.run tasks
   )
