@@ -4,12 +4,10 @@ guid = () ->
     Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1)
   "#{s4()}#{s4()}-#{s4()}-#{s4()}-#{s4()}-#{s4()}#{s4()}#{s4()}"
 
-@Game ?= {}
-
-class @Game.Event
+class Game.Event
   constructor: (@type, @data = null) ->
 
-class @Game.Publisher
+class Game.Publisher
   constructor: () ->
     @subscribers_ = []
     @id_ = guid()
@@ -38,7 +36,7 @@ class @Game.Publisher
     @subscribers_.forEach (s) => s.remove @
     return
 
-class @Game.Observer
+class Game.Observer
   constructor: () ->
     @subjects_ = []
     @listeners_ = {}
