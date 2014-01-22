@@ -79,6 +79,7 @@ class Game.GameError extends Error
   @ErrorType = {
     NOT_OBJECT: "You must call this method with a Game.Object instance."
     ALREADY_ADDED: "Object already added to state."
+    NOT_ADDED: "Object was not added to state."
   }
   constructor: (message) ->
     @name = 'GameError'

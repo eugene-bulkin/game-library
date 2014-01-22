@@ -29,6 +29,8 @@ class Game.State extends Game.TwoWay
     if obj.getId() of @objects
       delete @objects[obj.getId()]
       @remove obj
+    else
+      throw new Game.GameError(Game.GameError.ErrorType.NOT_ADDED)
   addEventHandler: (evtType, callback) ->
     if evtType not of @eventHandlers
       @eventHandlers[evtType] = []
