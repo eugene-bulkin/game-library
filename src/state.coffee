@@ -26,8 +26,9 @@ class Game.State extends Game.TwoWay
   removeObject: (obj) ->
     if obj not instanceof Game.Object
       throw new Game.GameError(Game.GameError.ErrorType.NOT_OBJECT)
-    if obj.getId() of @objects
-      delete @objects[obj.getId()]
+    oid = obj.getId()
+    if oid of @objects
+      delete @objects[oid]
       @remove obj
     else
       throw new Game.GameError(Game.GameError.ErrorType.NOT_ADDED)

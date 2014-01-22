@@ -91,7 +91,7 @@ describe 'State event handling', ->
       it 'Should remove an object correctly', ->
         expect(state).to.respondTo('removeObject', 'state must have removeObject method')
         state.removeObject p
-        expect(state.objects).to.not.have.property(pid, 'Object ID must no longer be key of state.objects')
+        expect(state.objects).to.not.have.property(pid)
       it "Shouldn't let you remove non Game.Object instance", ->
         removeNonObject = () ->
           state.removeObject 'asdf'

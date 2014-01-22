@@ -18,7 +18,7 @@ module.exports = (grunt) ->
         options: {
           compilers: 'coffee:coffee-script'
           require: 'chai'
-          reporter: 'nyan'
+          reporter: 'spec'
         }
         src: ['test/**/*.coffee']
       }

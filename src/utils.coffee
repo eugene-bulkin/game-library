@@ -21,7 +21,7 @@ class Game.Publisher
       # if you're not trying to pass an event, convert to an event
       e = new Game.Event(e, data)
     e.target = @
-    @subscribers_.forEach (s) => s.notify(@id, e, ctx)
+    @subscribers_.forEach (s) => s.notify(@id_, e, ctx)
     return
   subscribe: (observer) ->
     # here we assume that the observer has not already been subscribed
@@ -39,14 +39,15 @@ class Game.Publisher
 
 class Game.Observer
   constructor: () ->
-    @subjects_ = []
+    @subjects_ = {}
     @listeners_ = {}
   listen: (obj, cb) ->
-    if obj not in @subjects_
+    oid = obj.getId()
+    if oid not of @subjects_
       obj.subscribe @
-      @subjects_.push obj.id
+      @subjects_[oid] = obj
     # Add callback to the listeners object
-    @listeners_[obj.id] = cb
+    @listeners_[oid] = cb
     return
   notify: (objId, e, ctx = @) ->
     # if the object is being listened to, call
@@ -55,15 +56,15 @@ class Game.Observer
       (@listeners_[objId].bind ctx) e
     return
   remove: (subject) ->
-    for s, i in @subjects_
-      if s is subject.id
-        # Tell object to stop notifying this observer
-        s.unsubscribe @
-        # get rid of listeners associated with this object
-        delete @listeners_[s.id]
-        # remove this subject from the list of subjects
-        @subjects_.splice(i, 1)
-        break
+    sid = subject.getId()
+    if sid of @subjects_
+      s = @subjects_[sid]
+      # Tell object to stop notifying this observer
+      s.unsubscribe @
+      # get rid of listeners associated with this object
+      delete @listeners_[sid]
+      # remove this subject from the list of subjects
+      delete @subjects_[sid]
     return
 
 # Can observe and publish; CoffeeScript doesn't do mixins...
