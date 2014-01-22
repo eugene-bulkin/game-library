@@ -2,6 +2,7 @@ class Game.State extends Game.TwoWay
   constructor: () ->
     @objects = {}
     @eventCounters = {}
+    @eventHandlers = {}
     super
   onEvent: (e) ->
     # Add timestamped instance to the event counters object
@@ -10,6 +11,9 @@ class Game.State extends Game.TwoWay
     @eventCounters[e.type].push new Date()
     # relay the event upward
     @fire(e)
+    # call added callbacks
+    @eventHandlers[e.type].forEach (cb) -> cb()
+    return
   addObject: (obj) ->
     if obj not instanceof Game.Object
       throw new Game.Error(Game.Error.ErrorType.NOT_OBJECT)
@@ -19,3 +23,9 @@ class Game.State extends Game.TwoWay
     @listen(obj, @onEvent)
     # call object added method
     obj.added()
+  addEventHandler: (evtType, callback) ->
+    if evtType not of @eventHandlers
+      @eventHandlers[evtType] = []
+    if callback not in @eventHandlers[evtType]
+      @eventHandlers[evtType].push callback
+    return
