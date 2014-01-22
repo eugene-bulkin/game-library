@@ -38,3 +38,10 @@ class Game.State extends Game.TwoWay
     if callback not in @eventHandlers[evtType]
       @eventHandlers[evtType].push callback
     return
+  removeEventHandler: (evtType, callback) ->
+    if evtType of @eventHandlers
+      for cb, i in @eventHandlers[evtType]
+        if cb is callback
+          @eventHandlers[evtType].splice(i, 1)
+          break
+    return
