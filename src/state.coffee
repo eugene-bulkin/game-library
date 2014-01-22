@@ -23,6 +23,12 @@ class Game.State extends Game.TwoWay
     @listen(obj, @onEvent)
     # call object added method
     obj.added()
+  removeObject: (obj) ->
+    if obj not instanceof Game.Object
+      throw new Game.GameError(Game.Error.ErrorType.NOT_OBJECT)
+    if obj.getId() of @objects
+      delete @objects[obj.getId()]
+      @remove obj
   addEventHandler: (evtType, callback) ->
     if evtType not of @eventHandlers
       @eventHandlers[evtType] = []

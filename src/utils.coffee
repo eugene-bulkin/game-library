@@ -77,8 +77,7 @@ class Game.TwoWay extends Game.Publisher
 
 class Game.GameError extends Error
   @ErrorType = {
-    NOT_OBJECT: "Cannot add something that isn't a GameObject to the " +
-      "current game state."
+    NOT_OBJECT: "You must call this method with a Game.Object instance."
     ALREADY_ADDED: "Object already added to state."
   }
   constructor: (message) ->
