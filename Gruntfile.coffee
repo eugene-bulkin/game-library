@@ -13,6 +13,16 @@ module.exports = (grunt) ->
         tasks: ['build:production']
       }
     }
+    mochaTest: {
+      test: {
+        options: {
+          compilers: 'coffee:coffee-script'
+          require: 'chai'
+          reporter: 'nyan'
+        }
+        src: ['test/**/*.coffee']
+      }
+    }
     uglify: {
       options: {
         banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
@@ -48,6 +58,7 @@ module.exports = (grunt) ->
     'grunt-contrib-coffee'
     'grunt-contrib-watch'
     'grunt-coffeelint'
+    'grunt-mocha-test'
   ]
   for plugin in plugins
     grunt.loadNpmTasks plugin
@@ -59,6 +70,13 @@ module.exports = (grunt) ->
     inProduction = 'production' in args
     # uglify code in production only
     if inProduction then tasks.push 'uglify'
+
+    grunt.task.run tasks
+  )
+  grunt.registerTask('test', (args...) ->
+    tasks = []
+    if 'build' in args then tasks.push 'build:dev'
+    tasks.push 'mochaTest'
 
     grunt.task.run tasks
   )
