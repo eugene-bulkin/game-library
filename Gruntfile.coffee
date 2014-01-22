@@ -78,6 +78,10 @@ module.exports = (grunt) ->
     if 'build' in args then tasks.push 'build:dev'
     tasks.push 'mochaTest'
 
+    for arg in args
+      if arg is 'build' then continue
+      grunt.config.set('mochaTest.test.options.reporter', arg)
+
     grunt.task.run tasks
   )
 
