@@ -12,7 +12,7 @@ class Game.State extends Game.TwoWay
     # relay the event upward
     @fire(e)
     # call added callbacks
-    @eventHandlers[e.type].forEach (cb) -> cb()
+    @eventHandlers[e.type]?.forEach (cb) -> cb()
     return
   addObject: (obj) ->
     if obj not instanceof Game.Object
