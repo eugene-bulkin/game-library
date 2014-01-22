@@ -1,13 +1,6 @@
 Game = require('../build/game-library').Game
 expect = require('chai').expect
 
-describe 'Setup', ->
-  game = new Game.Application()
-  it 'Should be able to initialize Application', ->
-    game.init()
-  it 'Should have a state variable', ->
-    expect(game.state).to.exist
-
 class Player extends Game.Object
   constructor: () ->
     super
@@ -26,42 +19,7 @@ class Player extends Game.Object
     @fire('damage', { amount: amt, curHP: @hp })
     true
 
-describe 'Player object', ->
-  p = new Player()
-  describe 'Test construction', ->
-    it 'Should have MP and HP at defaults', ->
-      expect(p.hp).to.equal(100)
-      expect(p.mp).to.equal(50)
-    it 'Should have inherited Game.Object methods', ->
-      expect(p).to.respondTo('added')
-      expect(p).to.be.an.instanceof(Game.Object)
-    it 'Should have inherited Game.Publisher methods', ->
-      expect(p).to.have.property('id_')
-      expect(p).to.respondTo('getId')
-      expect(p).to.be.an.instanceof(Game.Publisher)
-  describe 'Test methods', ->
-    beforeEach ->
-      # reset player hp and mp each time
-      p.hp = 100
-      p.mp = 50
-    it 'Should take damage', ->
-      result = p.damage(15)
-      expect(result).to.be.true
-      expect(p.hp).to.equal(85)
-    it 'Should have HP go to zero if damage is greater than HP', ->
-      result = p.damage(150)
-      expect(result).to.be.true
-      expect(p.hp).to.equal(0)
-    it 'Should be able to use MP', ->
-      result = p.useMP(15)
-      expect(result).to.be.true
-      expect(p.mp).to.equal(35)
-    it 'Should not allow you to use more MP than you have', ->
-      result = p.useMP(150)
-      expect(result).to.be.false
-      expect(p.mp).to.equal(50)
-
-describe 'State event handling', ->
+describe 'Game State', ->
   describe 'Adding/removing objects', ->
     game = new Game.Application()
     game.init()
@@ -100,7 +58,7 @@ describe 'State event handling', ->
         removeObjectTwice = () ->
           state.removeObject p
         expect(removeObjectTwice).to.throw(Game.GameError, Game.GameError.ErrorType.NOT_ADDED)
-  describe 'Event handlers', ->
+  describe 'Event handling', ->
     game = new Game.Application()
     game.init()
     state = game.state
