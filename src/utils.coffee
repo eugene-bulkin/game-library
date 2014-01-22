@@ -5,14 +5,14 @@ guid = () ->
   "#{s4()}#{s4()}-#{s4()}-#{s4()}-#{s4()}-#{s4()}#{s4()}#{s4()}"
 
 class Game.Event
-  constructor: (@type, @data = null) ->
+  constructor: (@type, @data = null, @target = null) ->
 
 class Game.Publisher
   constructor: () ->
     @subscribers_ = []
     @id_ = guid()
-
-  fire: (e, data = null) ->
+  getId: () -> @id_
+  fire: (e, data = null, ctx = null) ->
     if e instanceof Game.Event
       # If there is data passed, overwrite data in
       # original event if it does not exist yet.
@@ -20,7 +20,8 @@ class Game.Publisher
     else
       # if you're not trying to pass an event, convert to an event
       e = new Game.Event(e, data)
-    @subscribers_.forEach (s) => s.notify(@id, e)
+    e.target = @
+    @subscribers_.forEach (s) => s.notify(@id, e, ctx)
     return
   subscribe: (observer) ->
     # here we assume that the observer has not already been subscribed
@@ -40,20 +41,18 @@ class Game.Observer
   constructor: () ->
     @subjects_ = []
     @listeners_ = {}
-  listen: (obj, e, cb) ->
+  listen: (obj, cb) ->
     if obj not in @subjects_
       obj.subscribe @
       @subjects_.push obj.id
-      @listeners_[obj.id] = {}
-    # An individual event can only be listened to with one
-    # callback per observed object.
-    @listeners_[obj.id][e] = cb
+    # Add callback to the listeners object
+    @listeners_[obj.id] = cb
     return
-  notify: (objId, e, data) ->
-    # if the event type is being listened to, call
+  notify: (objId, e, ctx = @) ->
+    # if the object is being listened to, call
     # that callback with the event
-    if e.type of @listeners_[objId]
-      @listeners_[objId][e.type] e
+    if objId of @listeners_
+      (@listeners_[objId].bind ctx) e
     return
   remove: (subject) ->
     for s, i in @subjects_
@@ -66,3 +65,24 @@ class Game.Observer
         @subjects_.splice(i, 1)
         break
     return
+
+# Can observe and publish; CoffeeScript doesn't do mixins...
+class Game.TwoWay extends Game.Publisher
+  for name, method of Game.Observer::
+    @::[name] = method
+  constructor: () ->
+    super
+    # Crudely extend Game.Observer
+    Game.Observer.call @
+
+class Game.Error extends window.Error
+  @ErrorType = {
+    NOT_OBJECT: "Cannot add something that isn't a GameObject to the " +
+      "current game state."
+    ALREADY_ADDED: "Object already added to state."
+  }
+  #@:: = window.Error::
+  constructor: (message) ->
+    @name = 'GameError'
+    @message = message
+    @stack = (new window.Error()).stack

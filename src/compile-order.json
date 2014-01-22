@@ -1,4 +1,7 @@
 [
   "base",
-  "utils"
+  "utils",
+  "objects",
+  "state",
+  "game"
 ]
