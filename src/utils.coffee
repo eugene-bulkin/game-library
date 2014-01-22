@@ -14,9 +14,8 @@ class Game.Publisher
   getId: () -> @id_
   fire: (e, data = null, ctx = null) ->
     if e instanceof Game.Event
-      # If there is data passed, overwrite data in
-      # original event if it does not exist yet.
-      e.data ?= data
+      # If there is data passed, overwrite data in original event
+      e.data = data or e.data
     else
       # if you're not trying to pass an event, convert to an event
       e = new Game.Event(e, data)
