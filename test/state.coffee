@@ -28,8 +28,9 @@ describe 'Game State', ->
     pid = p.getId()
     addedTime = null
     describe 'Adding objects', ->
+      it 'Should have addObject method', ->
+        expect(state).to.respondTo('addObject')
       it 'Should add an object correctly', ->
-        expect(state).to.respondTo('addObject', 'state must have addObject method')
         state.addObject p
         addedTime = new Date()
         expect(state.objects).to.have.property(pid, p, 'Object must be stored in state.objects')
@@ -46,8 +47,9 @@ describe 'Game State', ->
           state.addObject p
         expect(addObjectTwice).to.throw(Game.GameError, Game.GameError.ErrorType.ALREADY_ADDED)
     describe 'Removing objects', ->
+      it 'Should have removebject method', ->
+        expect(state).to.respondTo('removeObject')
       it 'Should remove an object correctly', ->
-        expect(state).to.respondTo('removeObject', 'state must have removeObject method')
         state.removeObject p
         expect(state.objects).to.not.have.property(pid)
       it "Shouldn't let you remove non Game.Object instance", ->
@@ -68,9 +70,8 @@ describe 'Game State', ->
     cb = (e) ->
       events.push e
     events = []
-    it 'Should have event handler methods', ->
+    it 'Should have addEventHandler method', ->
       expect(state).to.respondTo('addEventHandler')
-      expect(state).to.respondTo('removeEventHandler')
     it 'Should be able to add an event handler properly', ->
       state.addEventHandler('damage', cb)
       expect(state.eventHandlers).to.have.property('damage')
@@ -104,6 +105,8 @@ describe 'Game State', ->
       expect(events[3]).to.have.property('data')
       expect(events[3].data).to.have.property('amount', 100)
       expect(events[3].data).to.have.property('curMP', 50 - mp)
+    it 'Should have removeEventHandler method', ->
+      expect(state).to.respondTo('removeEventHandler')
     it 'Should remove event handler properly', ->
       state.removeEventHandler('damage', cb)
       expect(state.eventHandlers['damage']).to.not.contain(cb)

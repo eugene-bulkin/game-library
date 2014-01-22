@@ -13,8 +13,10 @@ describe 'Events', ->
     it 'Should be able to listen to children', ->
       parent.listen(child1, callback)
       parent.listen(child2, callback)
+    it 'Child subscribers should contain parent', ->
       expect(child1.subscribers_).to.contain(parent)
       expect(child2.subscribers_).to.contain(parent)
+    it 'Parent should have children in subjects and listeners', ->
       expect(parent.subjects_).to.have.property(child1.getId())
       expect(parent.subjects_).to.have.property(child2.getId())
       expect(parent.listeners_).to.have.property(child1.getId())
