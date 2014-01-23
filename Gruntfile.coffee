@@ -50,6 +50,12 @@ module.exports = (grunt) ->
         }
       }
     }
+    groc: {
+      coffee: [ "src/*.coffee", "README.md" ]
+      options: {
+        out: "doc/"
+      }
+    }
   }
 
   # Load plugins
@@ -59,6 +65,7 @@ module.exports = (grunt) ->
     'grunt-contrib-watch'
     'grunt-coffeelint'
     'grunt-mocha-test'
+    'grunt-groc'
   ]
   for plugin in plugins
     grunt.loadNpmTasks plugin
@@ -94,3 +101,4 @@ module.exports = (grunt) ->
   )
 
   grunt.registerTask('default', ['build:dev', 'watch:dev'])
+  grunt.registerTask('doc', ['groc'])
