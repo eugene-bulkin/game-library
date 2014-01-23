@@ -12,6 +12,10 @@ module.exports = (grunt) ->
         files: 'src/*.coffee'
         tasks: ['build:production']
       }
+      doc: {
+        files: ['src/*.coffee', 'test/**/*.coffee']
+        tasks: ['doc']
+      }
     }
     mochaTest: {
       test: {
