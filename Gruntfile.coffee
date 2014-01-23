@@ -51,7 +51,7 @@ module.exports = (grunt) ->
       }
     }
     groc: {
-      coffee: [ "src/*.coffee", "README.md" ]
+      coffee: [ "src/*.coffee", "test/**/*.coffee", "README.md" ]
       options: {
         out: "doc/"
       }
