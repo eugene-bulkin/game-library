@@ -41,8 +41,8 @@ Game.State = function() {
    */
   this.eventHandlers = {};
 };
-Game.State.extend(Game.Observer);
-Game.State.extend(Game.Publisher);
+extend(Game.State, Game.Observer);
+extend(Game.State, Game.Publisher);
 
 /**
  * Generic event handler. Takes an event. This is the callback
@@ -109,7 +109,7 @@ Game.State.prototype.removeObject = function(obj) {
   // If object is in the internal state...
   if(this.objects.hasOwnProperty(oid)) {
     // Remove it from the internal objects hash
-    delete this.objects[oid]
+    delete this.objects[oid];
     // Unlisten to the object
     this.remove(obj);
   }
@@ -145,7 +145,7 @@ Game.State.prototype.removeEventHandler = function(evtType, callback) {
   if(this.eventHandlers.hasOwnProperty(evtType)) {
     this.eventHandlers[evtType].forEach(function(cb, i) {
       if(cb === callback) {
-        this.eventHandlers[evtType].splice(i, 1)
+        this.eventHandlers[evtType].splice(i, 1);
         return false;
       }
     }, this);

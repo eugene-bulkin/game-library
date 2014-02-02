@@ -29,11 +29,9 @@ Game.Achievements = function(state) {
    * @protected
    */
   this.achievements = {};
-
-  this.listen(this.state, this.onEvent);
 };
-Game.Achievements.extend(Game.Observer);
-Game.Achievements.extend(Game.Publisher);
+extend(Game.Achievements, Game.Observer);
+extend(Game.Achievements, Game.Publisher);
 
 /**
  * Event handler

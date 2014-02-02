@@ -27,6 +27,10 @@ module.exports = function(grunt) {
       }
     },
     concat: {
+      options: {
+        banner: ';(function( window, undefined ){ \n "use strict";',
+        footer: '\n}(window));'
+      },
       dist: {
         src: fileOrder.map(function (file) {
           return "src/" + file + ".js";
@@ -54,7 +58,12 @@ module.exports = function(grunt) {
     },
     jshint: {
       jshint: {
-        all: ['Gruntfile.js', 'src/**/*.js', 'test/**/*.js']
+        options: {
+          eqnull: true
+        },
+        files: {
+          src: ['Gruntfile.js', 'src/**/*.js', 'test/**/*.js']
+        }
       }
     }
   });

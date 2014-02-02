@@ -12,7 +12,7 @@
 Game.Application = function() {
   Game.Observer.call(this);
 };
-Game.Application.extend(Game.Observer);
+extend(Game.Application, Game.Observer);
 
 /**
  * Initializes the state of the Game; has to be called manually because we have

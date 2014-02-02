@@ -8,11 +8,9 @@
  *
  * @param  {Object} parent Parent "class"
  */
-Object.prototype.extend = function (parent) {
-  for(var method in parent) {
-    if(parent.hasOwnProperty(method)) {
-      this.prototype[method] = parent[method];
-    }
+var extend = function (child, parent) {
+  for(var method in parent.prototype) {
+    child.prototype[method] = parent.prototype[method];
   }
 };
 
@@ -226,13 +224,14 @@ Game.Observer.prototype.remove = function(subject) {
  * @constructor
  */
 Game.Error = function(message) {
-  /** @type {string} */
   this.name = 'GameError';
-  /** @type {string} */
   this.message = message;
   this.stack = (new Error()).stack;
+  this.toString = function() {
+    return this.name + ": " + this.message;
+  };
 };
-Game.Error.extend(window.Error);
+extend(Game.Error, window.Error);
 
 /**
  * A hash of error types.
