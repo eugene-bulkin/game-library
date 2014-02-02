@@ -7,3 +7,5 @@ describe 'Setup', ->
     game.init()
   it 'Should have a state variable', ->
     expect(game.state).to.exist
+  it 'Should have an achievements variable', ->
+    expect(game.achievements).to.exist
