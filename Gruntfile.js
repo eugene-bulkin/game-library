@@ -68,6 +68,7 @@ module.exports = function(grunt) {
       test: {
         options: {
           eqnull: true,
+          sub: true,
           expr: true // so Chai expressions work
         },
         files: {

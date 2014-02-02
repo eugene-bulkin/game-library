@@ -8,12 +8,10 @@
  * State controller.
  *
  * @constructor
- * @mixes Game.Observer
- * @mixes Game.Publisher
+ * @extends Game.Messenger
  */
 Game.State = function() {
-  Game.Observer.call(this);
-  Game.Publisher.call(this);
+  Game.Messenger.call(this);
 
   /**
    * Keeps track of objects added to state.
@@ -41,8 +39,7 @@ Game.State = function() {
    */
   this.eventHandlers = {};
 };
-extend(Game.State, Game.Observer);
-extend(Game.State, Game.Publisher);
+extend(Game.State, Game.Messenger);
 
 /**
  * Generic event handler. Takes an event. This is the callback

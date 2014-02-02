@@ -8,12 +8,12 @@
  * A native class that sends some useful events.
  *
  * @constructor
- * @mixes Game.Publisher
+ * @extends Game.Messenger
  */
 Game.Object = function() {
-  Game.Publisher.call(this);
+  Game.Messenger.call(this);
 };
-extend(Game.Object, Game.Publisher, true);
+extend(Game.Object, Game.Messenger);
 
 /**
  * Called when the object is added to a state.

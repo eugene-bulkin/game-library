@@ -119,7 +119,7 @@ describe('Game State', function() {
     });
     it('Should remove event handler properly', function() {
       state.removeEventHandler('damage', cb);
-      expect(state.eventHandlers['damage']).to.not.contain(cb);
+      expect(state.eventHandlers.damage).to.not.contain(cb);
       p.damage(50);
       expect(events).to.have.length(4, 'Damage event not triggered after event handler removed');
     });

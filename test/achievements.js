@@ -16,7 +16,7 @@ describe('Achievements', function() {
   });
   describe('Achievements', function() {
     describe('Basic achievement handling', function() {
-      var observer = new Game.Observer();
+      var observer = new Game.Messenger();
       var events = [];
       var callback = function(e) {
         events.push(e);

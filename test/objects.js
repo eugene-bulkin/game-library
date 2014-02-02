@@ -12,10 +12,19 @@ describe('Objects', function() {
       });
       it('Should have inherited Game.Object methods', function() {
         expect(p).to.respondTo('added');
+        expect(p).to.be.an.instanceof(Game.Object);
       });
-      it('Should have inherited Game.Publisher methods', function() {
+      it('Should have inherited Game.Messenger methods', function() {
         expect(p).to.have.property('_id');
         expect(p).to.respondTo('getId');
+        expect(p).to.respondTo('fire');
+        expect(p).to.respondTo('subscribe');
+        expect(p).to.respondTo('unsubscribe');
+        expect(p).to.respondTo('destroy');
+        expect(p).to.respondTo('listen');
+        expect(p).to.respondTo('notify');
+        expect(p).to.respondTo('remove');
+        expect(p).to.be.an.instanceof(Game.Messenger);
       });
     });
     describe('Test methods', function() {

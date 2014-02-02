@@ -10,18 +10,10 @@ Game.Utils = {};
  *
  * @param  {Object} child Child "class"
  * @param  {Object} parent Parent "class"
- * @param  {Boolean=} pureExtend A linear extend, not a mixin
  */
-var extend = function (child, parent, pureExtend) {
+var extend = function (child, parent) {
   if(!parent) return;
-
-  if(pureExtend) {
-    child.prototype = parent.prototype;
-  } else {
-    for(var method in parent.prototype) {
-      child.prototype[method] = parent.prototype[method];
-    }
-  }
+  child.prototype = Object.create(parent.prototype);
 };
 Game.Utils.extend = extend;
 
@@ -72,14 +64,13 @@ Game.Event = function(type, data, target) {
 };
 
 /**
- * A Publisher mixin. Can send events.
+ * A Messenger class. Can send and receive events.
  *
- * @mixin
  * @constructor
  */
-Game.Publisher = function() {
+Game.Messenger = function() {
   /**
-   * @type {Game.Observer[]}
+   * @type {Game.Messenger[]}
    * @protected
    */
   this._subscribers = [];
@@ -88,6 +79,16 @@ Game.Publisher = function() {
    * @protected
    */
   this._id = guid();
+  /**
+   * @type {object.<string, Game.Messenger>}
+   * @protected
+   */
+  this._subjects = {};
+  /**
+   * @type {object.<string, function>}
+   * @protected
+   */
+  this._listeners = {};
 };
 
 /**
@@ -95,7 +96,7 @@ Game.Publisher = function() {
  *
  * @return {string}
  */
-Game.Publisher.prototype.getId = function() {
+Game.Messenger.prototype.getId = function() {
   return this._id;
 };
 
@@ -107,7 +108,7 @@ Game.Publisher.prototype.getId = function() {
  * @param  {object=} data
  * @param  {object=} ctx Tells the observer what context to run the callback in
  */
-Game.Publisher.prototype.fire = function(e, data, ctx) {
+Game.Messenger.prototype.fire = function(e, data, ctx) {
   // If there is data passed, overwrite data in original event
   if(e instanceof Game.Event) {
     e.data = data || e.data;
@@ -126,9 +127,9 @@ Game.Publisher.prototype.fire = function(e, data, ctx) {
 /**
  * Subscribe to an observer
  *
- * @param  {Game.Observer} observer
+ * @param  {Game.Messenger} observer
  */
-Game.Publisher.prototype.subscribe = function(observer) {
+Game.Messenger.prototype.subscribe = function(observer) {
   // We assume that the observer has not already been subscribed to
   this._subscribers.push(observer);
 };
@@ -136,9 +137,9 @@ Game.Publisher.prototype.subscribe = function(observer) {
 /**
  * Unsubscribe from an observer
  *
- * @param  {Game.Observer} observer
+ * @param  {Game.Messenger} observer
  */
-Game.Publisher.prototype.unsubscribe = function(observer) {
+Game.Messenger.prototype.unsubscribe = function(observer) {
   this._subscribers.forEach(function(sub, i){
     if(sub === observer) {
       this._subscribers.splice(i, 1);
@@ -150,38 +151,19 @@ Game.Publisher.prototype.unsubscribe = function(observer) {
 /**
  * Removes every handler listening to this object.
  */
-Game.Publisher.prototype.destroy = function() {
+Game.Messenger.prototype.destroy = function() {
   this._subscribers.forEach(function(sub) {
     sub.remove(this);
   }, this);
 };
 
 /**
- * An Observer mixin. Can listen to events.
- *
- * @mixin
- * @constructor
- */
-Game.Observer = function() {
-  /**
-   * @type {object.<string, Game.Publisher>}
-   * @protected
-   */
-  this._subjects = {};
-  /**
-   * @type {object.<string, function>}
-   * @protected
-   */
-  this._listeners = {};
-};
-
-/**
  * Listen to an object for its events
  *
- * @param  {Game.Publisher} obj
+ * @param  {Game.Messenger} obj
  * @param  {Function} cb
  */
-Game.Observer.prototype.listen = function(obj, cb) {
+Game.Messenger.prototype.listen = function(obj, cb) {
   var oid = obj.getId();
   // If the object has not already been listened to, subscribe this to it
   if(!this._subjects.hasOwnProperty(oid)) {
@@ -194,13 +176,13 @@ Game.Observer.prototype.listen = function(obj, cb) {
 };
 
 /**
- * Called by the Publisher to notify the Observer of an event.
+ * Called by the Messenger to notify its subscriber of an event.
  *
  * @param  {string} objId
  * @param  {Game.Event} e
- * @param  {object=} ctx Context to run the callback in. Defaults to the Observer itself.
+ * @param  {object=} ctx Context to run the callback in. Defaults to the Messenger itself.
  */
-Game.Observer.prototype.notify = function(objId, e, ctx) {
+Game.Messenger.prototype.notify = function(objId, e, ctx) {
   ctx = (ctx == null) ? this : ctx;
   /*
    * If the object is being listened to, call that callback with the event,
@@ -214,15 +196,15 @@ Game.Observer.prototype.notify = function(objId, e, ctx) {
 /**
  * Remove an object from this observer's listening
  *
- * @param  {Game.Publisher} subject
+ * @param  {Game.Messenger} subject
  */
-Game.Observer.prototype.remove = function(subject) {
+Game.Messenger.prototype.remove = function(subject) {
   var sid = subject.getId();
   if(this._subjects.hasOwnProperty(sid)) {
     var s = this._subjects[sid];
-    // Tell object to stop notifying this Observer
+    // Tell object to stop notifying this Messenger
     s.unsubscribe(this);
-    // Get rid of listeners associated with this Observer and remove this subject
+    // Get rid of listeners associated with this Messenger and remove this subject
     // from the list of subjects
     delete this._listeners[sid];
     delete this._subjects[sid];

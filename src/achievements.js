@@ -8,12 +8,10 @@
  * Achievements controller.
  *
  * @constructor
- * @mixes Game.Observer
- * @mixes Game.Publisher
+ * @extends Game.Messenger
  */
 Game.Achievements = function(state) {
-  Game.Observer.call(this);
-  Game.Publisher.call(this);
+  Game.Messenger.call(this);
 
   /**
    * @type {Game.State}
@@ -30,8 +28,7 @@ Game.Achievements = function(state) {
    */
   this.achievements = {};
 };
-extend(Game.Achievements, Game.Observer);
-extend(Game.Achievements, Game.Publisher);
+extend(Game.Achievements, Game.Messenger);
 
 /**
  * Event handler

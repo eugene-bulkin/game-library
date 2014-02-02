@@ -4,9 +4,9 @@ chai.use(require('chai-things'));
 var expect = chai.expect;
 
 describe('Events', function() {
-  var parent = new Game.Observer(),
-      child1 = new Game.Publisher(),
-      child2 = new Game.Publisher(),
+  var parent = new Game.Messenger(),
+      child1 = new Game.Messenger(),
+      child2 = new Game.Messenger(),
       lastEvent = null,
       lastCtx = null;
   var callback = function(e) {

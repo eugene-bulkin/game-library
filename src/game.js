@@ -6,13 +6,13 @@
 /**
  * Application wrapper
  *
- * @mixes Game.Observer
+ * @extends Game.Messenger
  * @constructor
  */
 Game.Application = function() {
-  Game.Observer.call(this);
+  Game.Messenger.call(this);
 };
-extend(Game.Application, Game.Observer);
+extend(Game.Application, Game.Messenger);
 
 /**
  * Initializes the state of the Game; has to be called manually because we have

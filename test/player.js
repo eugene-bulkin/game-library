@@ -6,7 +6,7 @@ var Player = function() {
   this.hp = 100;
   this.mp = 50;
 };
-Game.Utils.extend(Player, Game.Object, true);
+Game.Utils.extend(Player, Game.Object);
 
 Player.prototype.useMP = function(amt) {
   if(amt > this.mp) {
