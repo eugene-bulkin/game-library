@@ -2,14 +2,14 @@
   "name": "game-library",
   "version": "0.0.1",
   "devDependencies": {
-    "grunt-contrib-coffee": "~0.8.2",
-    "grunt-contrib-uglify": "~0.3.1",
+    "grunt-contrib-uglify": "latest",
     "grunt": "~0.4.2",
-    "grunt-coffeelint": "0.0.8",
-    "grunt-contrib-watch": "~0.5.3",
-    "grunt-mocha-test": "~0.8.2",
-    "chai": "~1.8.1",
-    "mocha": "~1.17.0",
-    "grunt-groc": "~0.4.0"
+    "grunt-contrib-watch": "latest",
+    "grunt-mocha-test": "latest",
+    "chai": "latest",
+    "mocha": "latest",
+    "grunt-jsdoc": "latest",
+    "grunt-contrib-jshint": "latest",
+    "grunt-contrib-concat": "latest"
   }
 }
