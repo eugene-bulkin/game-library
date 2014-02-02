@@ -12,5 +12,6 @@ class Game.Application extends Game.Observer
   init: () ->
     # Create a new Game.State for use with the game
     @state = new Game.State()
+    # Create a new Game.Achievements with the state
     @achievements = new Game.Achievements(@state)
     return
