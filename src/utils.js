@@ -3,16 +3,27 @@
  * @author Eugene Bulkin <eugene@eugenebulkin.name>
  */
 
+Game.Utils = {};
+
 /**
  * Extend method for Objects.
  *
+ * @param  {Object} child Child "class"
  * @param  {Object} parent Parent "class"
+ * @param  {Boolean=} pureExtend A linear extend, not a mixin
  */
-var extend = function (child, parent) {
-  for(var method in parent.prototype) {
-    child.prototype[method] = parent.prototype[method];
+var extend = function (child, parent, pureExtend) {
+  if(!parent) return;
+
+  if(pureExtend) {
+    child.prototype = parent.prototype;
+  } else {
+    for(var method in parent.prototype) {
+      child.prototype[method] = parent.prototype[method];
+    }
   }
 };
+Game.Utils.extend = extend;
 
 /**
  * Generates a GUID randomly. See
@@ -27,6 +38,7 @@ var guid = function() {
 
   return s4() + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + s4() + s4();
 };
+Game.Utils.guid = guid;
 
 /**
  * Creates an Event class that stores some information about the event and
@@ -107,7 +119,7 @@ Game.Publisher.prototype.fire = function(e, data, ctx) {
   e.target = this;
   // Notify all subscribers
   this._subscribers.forEach(function (sub) {
-    sub.notify(this.id_, e, ctx);
+    sub.notify(this._id, e, ctx);
   }, this);
 };
 

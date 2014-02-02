@@ -3,13 +3,14 @@
   "version": "0.0.1",
   "devDependencies": {
     "grunt-contrib-uglify": "latest",
-    "grunt": "~0.4.2",
+    "grunt": "latest",
     "grunt-contrib-watch": "latest",
     "grunt-mocha-test": "latest",
     "chai": "latest",
     "mocha": "latest",
     "grunt-jsdoc": "latest",
     "grunt-contrib-jshint": "latest",
-    "grunt-contrib-concat": "latest"
+    "grunt-contrib-concat": "latest",
+    "chai-things": "latest"
   }
 }

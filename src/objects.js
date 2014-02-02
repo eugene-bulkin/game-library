@@ -13,7 +13,7 @@
 Game.Object = function() {
   Game.Publisher.call(this);
 };
-extend(Game.Object, Game.Publisher);
+extend(Game.Object, Game.Publisher, true);
 
 /**
  * Called when the object is added to a state.

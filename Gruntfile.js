@@ -5,7 +5,7 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     watch: {
       dev: {
-        files: ['src/*.js', 'src/compile-order.json'],
+        files: ['src/*.js', 'test/**/*.js', 'src/compile-order.json'],
         tasks: ['build:dev']
       },
       production: {
@@ -13,7 +13,7 @@ module.exports = function(grunt) {
         tasks: ['build:production']
       },
       doc: {
-        files: ['src/*.js', 'test/**/*.js'],
+        files: ['src/*.js', 'README.md'],
         tasks: ['doc']
       }
     },
@@ -29,7 +29,7 @@ module.exports = function(grunt) {
     concat: {
       options: {
         banner: ';(function( window, undefined ){ \n "use strict";',
-        footer: '\n}(window));'
+        footer: '\n}(this));'
       },
       dist: {
         src: fileOrder.map(function (file) {
@@ -50,19 +50,28 @@ module.exports = function(grunt) {
     },
     jsdoc: {
       dist: {
-        src: ['src/*.js', 'test/**/*.js', 'README.md'],
+        src: ['src/*.js', 'README.md'],
         options: {
           destination: 'doc'
         }
       }
     },
     jshint: {
-      jshint: {
+      src: {
         options: {
           eqnull: true
         },
         files: {
-          src: ['Gruntfile.js', 'src/**/*.js', 'test/**/*.js']
+          src: ['Gruntfile.js', 'src/**/*.js']
+        }
+      },
+      test: {
+        options: {
+          eqnull: true,
+          expr: true // so Chai expressions work
+        },
+        files: {
+          src: ['test/**/*.js']
         }
       }
     }
