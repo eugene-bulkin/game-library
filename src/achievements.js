@@ -49,6 +49,26 @@ Game.Achievements.prototype.init = function() {
 };
 
 /**
+ * Check whether data is a subset of object
+ *
+ * @param  {object} object
+ * @param  {object} data
+ *
+ * @return {Boolean}
+ */
+Game.Achievements.prototype.matchData = function(object, data) {
+  return Object.keys(data).every(function(key) {
+    if(typeof data[key] !== typeof object[key]) {
+      return false;
+    } else if(typeof data[key] === 'object') {
+      return matchData(object[key], data[key]);
+    } else {
+      return data[key] === object[key];
+    }
+  });
+};
+
+/**
  * Called to check whether a particular requirement is satisfied.
  *
  * Requirement array format:
@@ -67,14 +87,50 @@ Game.Achievements.prototype.init = function() {
  * @return {Boolean}
  */
 Game.Achievements.prototype.satisfied = function(req) {
-  if(req.length === 1) {
-    // only one argument means just check that the event occurred once
-    if (this.state.eventCounters.hasOwnProperty(req[0]) &&
-        this.state.eventCounters[req[0]].length > 0) {
-      return true;
-    }
+  if(req.length === 0) {
+    return false;
   }
-  return false;
+  var achMatch = req[0].match(/^a:(\w+)$/);
+  if(achMatch) {
+    return this.hasAchieved(achMatch[1]);
+  }
+  if(!this.state.eventCounters.hasOwnProperty(req[0])) {
+    return false;
+  }
+  var counter = this.state.eventCounters[req[0]];
+  // only one argument means just check that the event occurred once
+  if(req.length === 1) {
+    return (counter.length > 0);
+  }
+  // filter out events that don't match the required data
+  if(req[1] != null) {
+    counter = counter.filter(function(e) {
+      return this.matchData(e.data, req[1]);
+    }, this);
+  }
+  // if there's a time, filter out all events that occurred before the last
+  // however many milliseconds
+  if(req.length >= 4) {
+    if(!req[3]) {
+      return false;
+    }
+    var origin = new Date();
+    if(req[4]) {
+      if(!this.state.eventCounters[req[4]]) {
+        return false;
+      }
+      origin = this.state.eventCounters[req[4]].slice(-1)[0].time;
+    }
+    counter = counter.filter(function(e) {
+      return (origin - e.time <= req[3]);
+    });
+  }
+  // set a count for how many we want
+  var count = 1;
+  if(req.length >= 3) {
+    count = (req[2] > 0) ? req[2] : count;
+  }
+  return (counter.length >= count);
 };
 
 /**
@@ -83,7 +139,6 @@ Game.Achievements.prototype.satisfied = function(req) {
  * @param  {Game.Event} e
  */
 Game.Achievements.prototype.onEvent = function(e) {
-  console.log(e.type, e.data, new Date().getTime());
   Object.keys(this.achievements).forEach(function(name) {
     var reqs = this.achievements[name];
     var achieved = reqs.every(this.satisfied, this);
