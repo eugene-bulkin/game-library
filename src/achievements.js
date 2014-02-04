@@ -27,8 +27,14 @@ Game.Achievements = function(state) {
    * @protected
    */
   this.achievements = {};
+
+  this.init();
 };
 extend(Game.Achievements, Game.Messenger);
+
+Game.Achievements.prototype.init = function() {
+  this.listen(this.state, this.onEvent);
+};
 
 /**
  * Event handler
@@ -57,4 +63,5 @@ Game.Achievements.prototype.hasAchieved = function(name) {
  * @param {array} requirements
  */
 Game.Achievements.prototype.addAchievement = function(name, requirements) {
+  this.achievements[name] = requirements;
 };
