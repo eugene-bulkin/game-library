@@ -58,12 +58,12 @@ describe('Achievements', function() {
           ['asdf2', null, 5, 1000]
         ],
         withinTimeOf: [
-          ['asdf', null, 1, 1000, 'asdf2']
+          ['asdf', null, 1, 1000, 'asdf6']
         ],
         requireAchievement: [
           ['a:basicCount'],
           ['asdf5']
-        ],
+        ]
       };
       Object.keys(data).forEach(function(name) {
         var reqs = data[name];
@@ -122,12 +122,12 @@ describe('Achievements', function() {
         o.fire('asdf');
         expect(achievements.hasAchieved('withinTimeOf')).to.be.false;
         setTimeout(function() {
-          o.fire('asdf2');
+          o.fire('asdf6');
           expect(achievements.hasAchieved('withinTimeOf')).to.be.false;
           o.fire('asdf');
         }, 1250);
         setTimeout(function() {
-          o.fire('asdf2');
+          o.fire('asdf6');
           expect(achievements.hasAchieved('withinTimeOf')).to.be.true;
           done();
         }, 1250 + 750);
