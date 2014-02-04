@@ -6,6 +6,8 @@ describe('Achievements', function() {
   game.init();
   var state = game.state;
   var achievements = game.achievements;
+  var o = new Game.Object();
+  state.addObject(o);
   describe('Structure', function() {
     it('Should have an addAchievement method', function() {
       expect(achievements).to.respondTo('addAchievement');
@@ -15,8 +17,11 @@ describe('Achievements', function() {
     });
   });
   describe('Achievements', function() {
+    var observer = new Game.Messenger();
+    after(function() {
+      observer.remove(achievements);
+    });
     describe('Basic achievement handling', function() {
-      var observer = new Game.Messenger();
       var events = [];
       var callback = function(e) {
         events.push(e);
@@ -30,12 +35,12 @@ describe('Achievements', function() {
         expect(achievements.achievements).to.have.property('test', data);
       });
       it('Should fire achievement event when an achievement is achieved', function() {
-        state.fire('test');
+        o.fire('test');
         lastEvent = events.pop();
+        expect(lastEvent).to.not.be.undefined;
         expect(lastEvent).to.have.property('type', 'achievement');
         expect(lastEvent.data).to.have.property('name', 'test');
       });
-      observer.remove(achievements);
     });
     describe('Different kinds of achievements', function() {
       var data = {
@@ -71,22 +76,22 @@ describe('Achievements', function() {
       it('Should work with achievements that require a count', function() {
         expect(achievements.hasAchieved('basicCount')).to.be.false;
         for(var i = 1; i <= 5; i++) {
-          state.fire('asdf', { type: (i / 3) | 0 });
+          o.fire('asdf', { type: (i / 3) | 0 });
         }
         expect(achievements.hasAchieved('basicCount')).to.be.true;
       });
       it('Should work with achievements that require a count with data', function() {
         expect(achievements.hasAchieved('countData')).to.be.false;
         for(var i = 1; i <= 2; i++) {
-          state.fire('asdf', { type: 1 });
+          o.fire('asdf', { type: 1 });
         }
         expect(achievements.hasAchieved('countData')).to.be.true;
       });
       it('Should work with multiple required events', function() {
         expect(achievements.hasAchieved('multiple')).to.be.false;
-        state.fire('asdf3');
+        o.fire('asdf3');
         expect(achievements.hasAchieved('multiple')).to.be.false;
-        state.fire('asdf4');
+        o.fire('asdf4');
         expect(achievements.hasAchieved('multiple')).to.be.true;
       });
       it('Should work with achievements that require a count within a time period', function(done) {
@@ -95,34 +100,34 @@ describe('Achievements', function() {
         times = [];
         // Run the event 5 times in a 1500ms span
         for(var i = 1; i <= 4; i++) {
-          state.fire('asdf2');
+          o.fire('asdf2');
         }
         setTimeout(function() {
-          state.fire('asdf2');
+          o.fire('asdf2');
           expect(achievements.hasAchieved('countWithinTime')).to.be.false;
           times = [];
           for(var i = 1; i <= 4; i++) {
-            state.fire('asdf2');
+            o.fire('asdf2');
           }
         }, 1250);
         // Run the event 5 times in a 750ms span
         setTimeout(function() {
-          state.fire('asdf2');
+          o.fire('asdf2');
           expect(achievements.hasAchieved('countWithinTime')).to.be.true;
           done();
         }, 1250 + 750);
       });
       it('Should work with achievements that require an event to be fired within a time period after another event', function(done) {
         this.timeout(2500);
-        state.fire('asdf');
+        o.fire('asdf');
         expect(achievements.hasAchieved('withinTimeOf')).to.be.false;
         setTimeout(function() {
-          state.fire('asdf2');
+          o.fire('asdf2');
           expect(achievements.hasAchieved('withinTimeOf')).to.be.false;
-          state.fire('asdf');
+          o.fire('asdf');
         }, 1250);
         setTimeout(function() {
-          state.fire('asdf2');
+          o.fire('asdf2');
           expect(achievements.hasAchieved('withinTimeOf')).to.be.true;
           done();
         }, 1250 + 750);
@@ -130,7 +135,7 @@ describe('Achievements', function() {
       it('Should work with achievements that require a prior achievement', function() {
         expect(achievements.hasAchieved('basicCount')).to.be.true;
         expect(achievements.hasAchieved('requireAchievement')).to.be.false;
-        state.fire('asdf5');
+        o.fire('asdf5');
         expect(achievements.hasAchieved('requireAchievement')).to.be.true;
       });
     });
