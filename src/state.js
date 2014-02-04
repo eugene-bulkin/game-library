@@ -56,7 +56,10 @@ Game.State.prototype.onEvent = function(e) {
     this.eventHandlers[e.type] = [];
   }
   // Add timestamped instance to event counters object
-  this.eventCounters[e.type].push(new Date());
+  this.eventCounters[e.type].push({
+    time: new Date(),
+    data: e.data
+  });
   // Relay the event upward
   this.fire(e);
   // Call additional callbacks if there are any
