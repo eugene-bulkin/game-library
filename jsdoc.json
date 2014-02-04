@@ -1,0 +1,17 @@
+{
+  "plugins": [ "plugins/markdown" ],
+  "templates": {
+    "cleverLinks": false,
+    "monospaceLinks": false
+  },
+  "opts": {
+    "template": "templates/default",
+    "encoding": "utf8",
+    "destination": "./doc/",
+    "recurse": true,
+    "tutorials": "",
+    "query": "",
+    "private": true,
+    "lenient": true
+  }
+}

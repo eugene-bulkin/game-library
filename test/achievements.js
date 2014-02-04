@@ -83,7 +83,7 @@ describe('Achievements', function() {
       it('Should work with achievements that require a count with data', function() {
         expect(achievements.hasAchieved('countData')).to.be.false;
         for(var i = 1; i <= 2; i++) {
-          o.fire('asdf', { type: 1 });
+          o.fire('asdf', { type: 1, blah: 4 });
         }
         expect(achievements.hasAchieved('countData')).to.be.true;
       });

@@ -21,21 +21,60 @@ Game.Achievements = function(state) {
 
   /**
    * Internal achievements hash. Keys are the names of the achievements,
-   * and the array is the data describing them.
+   * and the array is the data describing them. This hash only contains
+   * unattained achievements.
    *
    * @type {object.<string, array>}
    * @protected
    */
   this.achievements = {};
 
+  /**
+   * Internal achievements hash. Keeps track of attained achievements.
+   *
+   * @type {object.<string, array>}
+   * @protected
+   */
   this.achieved = {};
 
   this.init();
 };
 extend(Game.Achievements, Game.Messenger);
 
+/**
+ * Init function. Called from constructor to listen to the state.
+ */
 Game.Achievements.prototype.init = function() {
   this.listen(this.state, this.onEvent);
+};
+
+/**
+ * Called to check whether a particular requirement is satisfied.
+ *
+ * Requirement array format:
+ *
+ * - `0`: name of event or "a:" + name of achievement
+ * - `1`: event data (must be a subset of the event data)
+ * - `2`: number of occurrences of event
+ * - `3`: time window observed
+ * - `4`: name of event that must have occurred within the time window
+ *
+ * Only the first argument is required. The time window argument is only
+ * required if the last argument is specified.
+ *
+ * @param  {Array} req An array detailing an achievement requirement
+ *
+ * @return {Boolean}
+ */
+Game.Achievements.prototype.satisfied = function(req) {
+  if(req.length === 1) {
+    // only one argument means just check that the event occurred once
+    if (this.state.eventCounters.hasOwnProperty(req[0]) &&
+        this.state.eventCounters[req[0]].length > 0) {
+      return true;
+    }
+  }
+  return false;
 };
 
 /**
@@ -47,15 +86,7 @@ Game.Achievements.prototype.onEvent = function(e) {
   console.log(e.type, e.data, new Date().getTime());
   Object.keys(this.achievements).forEach(function(name) {
     var reqs = this.achievements[name];
-    var achieved = reqs.every(function(req) {
-      if(req.length === 1) {
-        // only one argument means just check that the event occurred once
-        if (this.state.eventCounters.hasOwnProperty(req[0]) &&
-            this.state.eventCounters[req[0]].length > 0) {
-          return true;
-        }
-      }
-    }, this);
+    var achieved = reqs.every(this.satisfied, this);
     if(achieved) {
       this.fire('achievement', { name: name });
       // shift the achievement to the already achieved hash
