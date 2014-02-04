@@ -28,6 +28,8 @@ Game.Achievements = function(state) {
    */
   this.achievements = {};
 
+  this.achieved = {};
+
   this.init();
 };
 extend(Game.Achievements, Game.Messenger);
@@ -43,6 +45,26 @@ Game.Achievements.prototype.init = function() {
  */
 Game.Achievements.prototype.onEvent = function(e) {
   console.log(e.type, e.data, new Date().getTime());
+  Object.keys(this.achievements).forEach(function(name) {
+    var reqs = this.achievements[name];
+    var achieved = reqs.every(function(req) {
+      if(req.length === 1) {
+        // only one argument means just check that the event occurred once
+        if (this.state.eventCounters.hasOwnProperty(req[0]) &&
+            this.state.eventCounters[req[0]].length > 0) {
+          return true;
+        }
+      }
+    }, this);
+    if(achieved) {
+      this.fire('achievement', { name: name });
+      // shift the achievement to the already achieved hash
+      // since we don't want to worry about it later
+      // plus this separates achieved from unachieved achievements
+      this.achieved[name] = reqs;
+      delete this.achievements[name];
+    }
+  }, this);
 };
 
 /**
@@ -53,7 +75,7 @@ Game.Achievements.prototype.onEvent = function(e) {
  * @return {Boolean}
  */
 Game.Achievements.prototype.hasAchieved = function(name) {
-  return false;
+  return this.achieved.hasOwnProperty(name);
 };
 
 /**
