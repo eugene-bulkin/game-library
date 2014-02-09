@@ -1,0 +1,5 @@
+build/
+doc/
+*.sublime-*
+wiki/
+node_modules/
