@@ -29,7 +29,7 @@ describe('Achievements', function() {
       observer.listen(achievements, callback);
       it('Should add achievements properly', function() {
         var data = [
-          ['test']
+          { name: 'test' }
         ];
         achievements.addAchievement('test', data);
         expect(achievements.achievements).to.have.property('test', data);
@@ -45,24 +45,24 @@ describe('Achievements', function() {
     describe('Different kinds of achievements', function() {
       var data = {
         basicCount: [
-          ['asdf', null, 5]
+          { name: 'asdf', count: 5 }
         ],
         countData: [
-          ['asdf', { type: 1 }, 5]
+          { name: 'asdf', count: 5, data: { type: 1 } }
         ],
         multiple: [
-          ['asdf3'],
-          ['asdf4']
+          { name: 'asdf3' },
+          { name: 'asdf4' }
         ],
         countWithinTime: [
-          ['asdf2', null, 5, 1000]
+          { name: 'asdf2', count: 5, within: 1000 }
         ],
         withinTimeOf: [
-          ['asdf', null, 1, 1000, 'asdf6']
+          { name: 'asdf', count: 1, within: 1000, prereq: 'asdf6' }
         ],
         requireAchievement: [
-          ['a:basicCount'],
-          ['asdf5']
+          { name: 'a:basicCount' },
+          { name: 'asdf5' }
         ]
       };
       Object.keys(data).forEach(function(name) {

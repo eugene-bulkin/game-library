@@ -2,10 +2,17 @@
 ///<reference path="./Messenger.ts" />
 
 module Game {
+  interface Requirement {
+    name: string;
+    data?: any;
+    count?: number;
+    within?: number;
+    prereq?: string;
+  }
   export class Achievements extends Messenger {
     public state: State;
-    public achievements: { [x: string]: any[] };
-    public achieved: { [x: string]: any[] };
+    public achievements: { [x: string]: Requirement[] };
+    public achieved: { [x: string]: Requirement[] };
 
     /**
      * Achievements controller.
@@ -30,7 +37,7 @@ module Game {
        * @type {object.<string, array>}
        * @protected
        */
-      this.achievements = {}
+      this.achievements = {};
 
       /**
        * Internal achievements hash. Keeps track of attained achievements.
@@ -38,7 +45,7 @@ module Game {
        * @type {object.<string, array>}
        * @protected
        */
-      this.achieved = {}
+      this.achieved = {};
 
       this.init();
     }
@@ -88,49 +95,43 @@ module Game {
      *
      * @return {Boolean}
      */
-    private satisfied(req: any[]): boolean {
-      if(req.length === 0) {
+    private satisfied(req: Requirement): boolean {
+      if(!req.name) {
         return false;
       }
-      var achMatch = req[0].match(/^a:(\w+)$/);
+      // return false if they specify a prereq without a time period
+      if(req.prereq && !req.within) {
+        return false;
+      }
+      var achMatch = req.name.match(/^a:(\w+)$/);
       if(achMatch) {
         return this.hasAchieved(achMatch[1]);
       }
-      if(!this.state.eventCounters.hasOwnProperty(req[0])) {
+      if(!this.state.eventCounters.hasOwnProperty(req.name)) {
         return false;
       }
-      var counter: Counter[] = this.state.eventCounters[req[0]];
-      // only one argument means just check that the event occurred once
-      if(req.length === 1) {
-        return (counter.length > 0);
-      }
+      var counter: Counter[] = this.state.eventCounters[req.name];
+      // set default count
+      var count = (req.count && req.count > 0) ? req.count : 1;
       // filter out events that don't match the required data
-      if(req[1] != null) {
+      if(req.data) {
         counter = counter.filter(function(e: Counter) {
-          return this.matchData(e.data, req[1]);
+          return this.matchData(e.data, req.data);
         }, this);
       }
       // if there's a time, filter out all events that occurred before the last
       // however many milliseconds
-      if(req.length >= 4) {
-        if(!req[3]) {
-          return false;
-        }
+      if(req.within) {
         var origin = new Date();
-        if(req[4]) {
-          if(!this.state.eventCounters[req[4]]) {
+        if(req.prereq) {
+          if(!this.state.eventCounters[req.prereq]) {
             return false;
           }
-          origin = this.state.eventCounters[req[4]].slice(-1)[0].time;
+          origin = this.state.eventCounters[req.prereq].slice(-1)[0].time;
         }
         counter = counter.filter(function(e: Counter) {
-          return (origin.getTime() - e.time.getTime() <= req[3]);
+          return (origin.getTime() - e.time.getTime() <= req.within);
         });
-      }
-      // set a count for how many we want
-      var count = 1;
-      if(req.length >= 3) {
-        count = (req[2] > 0) ? req[2] : count;
       }
       return (counter.length >= count);
     }
@@ -162,7 +163,7 @@ module Game {
      *
      * @return {Boolean}
      */
-    public hasAchieved(name) {
+    public hasAchieved(name: string): boolean {
       return this.achieved.hasOwnProperty(name);
     }
 
@@ -170,9 +171,9 @@ module Game {
      * Adds an achievement to be tracked
      *
      * @param {string} name
-     * @param {array} requirements
+     * @param {object} requirements
      */
-    public addAchievement(name, requirements) {
+    public addAchievement(name: string, requirements: Requirement[]): void {
       this.achievements[name] = requirements;
     }
   }
