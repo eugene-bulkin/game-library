@@ -2,7 +2,7 @@
 ///<reference path="./Messenger.ts" />
 
 module Game {
-  interface Requirement {
+  export interface Requirement {
     name: string;
     data?: any;
     count?: number;
