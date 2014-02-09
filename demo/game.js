@@ -67,8 +67,12 @@ var achievements = {
   "5 Blues": [ { name: "destroy", data: {color: "#44f"}, count: 5 } ],
   "5 Reds": [ { name: "destroy", data: {color: "#f44"}, count: 5 } ],
   "5 Greens": [ { name: "destroy", data: {color: "#4f4"}, count: 5 } ],
+  "5 Silvers": [ { name: "destroy", data: {color: "#c0c0c0"}, count: 5 } ],
+  "5 Golds": [ { name: "destroy", data: {color: "#ffd700"}, count: 5 } ],
   "Colorful": [ { name: "a:5 Blues" }, { name: "a:5 Greens" }, { name: "a:5 Reds" } ],
-  "Quickfire": [ { name: "destroy", within: 1000, count: 3 } ]
+  "Super Colorful": [ { name: "a:Colorful" }, { name: "a:5 Silvers" }, { name: "a:5 Golds" } ],
+  "Quickfire": [ { name: "destroy", within: 1000, count: 3 } ],
+  "Quickfire - One of Each": [ { name: "destroy", data: {color: "#4f4"}, within: 1000 }, { name: "destroy", data: {color: "#44f"}, within: 1000 }, { name: "destroy", data: {color: "#f44"}, within: 1000 } ]
 };
 
 var aList = document.getElementById('achievements');
@@ -85,15 +89,30 @@ Object.keys(achievements).forEach(function(name) {
 });
 
 var colors = {
-  "#44f": 1,
-  "#f44": 2,
-  "#4f4": 3
+  "#44f": 5,
+  "#f44": 10,
+  "#4f4": 20,
+  "#c0c0c0": 65,
+  "#ffd700": 130
 };
+var colorNames = Object.keys(colors);
+var freqs = colorNames.map(function(k){ return 1 / colors[k]; });
+var total = freqs.reduce(function(a,b){ return a+b; }, 0);
+
+function roulette() {
+  var selection = Math.random() * total;
+  var running = 0, i = 0;
+  while(selection > running) {
+    running += freqs[i];
+    i++;
+  }
+  return colorNames[i - 1];
+}
 
 var interval = setInterval(function() {
   if(Object.keys(circles).length > 15) {
     return;
   }
-  var c = new Circle(randRange(25, 60), randChoice(Object.keys(colors)));
+  var c = new Circle(randRange(25, 60), roulette());
   game.state.addObject(c, s);
 }, 750);
