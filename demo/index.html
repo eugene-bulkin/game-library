@@ -7,6 +7,10 @@
     #achievements li {
       color: #888;
       list-style: none;
+      display: inline;
+    }
+    #achievements li:not(:last-child)::after {
+      content: " | ";
     }
     #achievements li.achieved {
       color: #000;
