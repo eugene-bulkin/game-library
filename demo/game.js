@@ -51,7 +51,7 @@ function onEvent(e) {
 }
 
 function onAchievement(e) {
-  console.log("'" + e.data.name + "' achieved!");
+  document.querySelector('li[data-name="' + e.data.name + '"]').classList.add("achieved");
 }
 
 var s = new Snap("#svg");
