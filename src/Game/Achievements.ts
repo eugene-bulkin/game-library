@@ -146,7 +146,7 @@ module Game {
         var reqs = this.achievements[name];
         var achieved = reqs.every(this.satisfied, this);
         if(achieved) {
-          this.fire('achievement', { name: name });
+          this.fire('achievement', { name: name, reqs: reqs });
           // shift the achievement to the already achieved hash
           // since we don't want to worry about it later
           // plus this separates achieved from unachieved achievements

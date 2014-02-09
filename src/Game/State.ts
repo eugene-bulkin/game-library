@@ -84,7 +84,7 @@ module Game {
      * @throws {Game.Error.ErrorType.NOT_OBJECT} If obj is not a {@link Game.GameObject} instance.
      * @throws {Game.Error.ErrorType.ALREADY_ADDED} If obj was already added to the state.
      */
-    public addObject(obj: GameObject) {
+    public addObject(obj: GameObject, ...args: any[]) {
       if(!(obj instanceof GameObject)) {
         throw new GameError(GameError.ErrorType.NOT_OBJECT);
       }
@@ -97,7 +97,7 @@ module Game {
       // Listen to the object for any event
       this.listen(obj, this.onEvent);
       // Call the object's added method so it knows it has been added
-      obj.added();
+      obj.added.apply(obj, args);
     }
 
     /**
