@@ -103,7 +103,7 @@ module Game {
       if(req.prereq && !req.within) {
         return false;
       }
-      var achMatch = req.name.match(/^a:(\w+)$/);
+      var achMatch = req.name.match(/^a:(.+)$/);
       if(achMatch) {
         return this.hasAchieved(achMatch[1]);
       }
