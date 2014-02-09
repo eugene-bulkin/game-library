@@ -23,16 +23,24 @@ Circle.prototype.added = function(s) {
   var bounds = s.node.getBoundingClientRect();
   var x = randRange(this.radius, bounds.width - this.radius);
   var y = randRange(this.radius, bounds.height - this.radius);
-  var border = 2;
+  var border = 3;
+
+  var hsl = Snap.rgb2hsl(Snap.getRGB(this.color));
+  hsl.l = hsl.l / 2.5;
 
   this.element = s.circle(x, y, this.radius - 2 * border);
   this.element.attr({
     fill: this.color,
     strokeWidth: border,
-    stroke: "#000"
+    stroke: Snap.hsl2rgb(hsl).hex
   });
 
   this.element.click(this.onClick.bind(this));
+  this.element.hover(function(){
+    this.attr({ strokeWidth: 2 * border });
+  }, function(){
+    this.attr({ strokeWidth: border });
+  });
 };
 
 Circle.prototype.onClick = function(e) {
