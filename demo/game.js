@@ -72,16 +72,19 @@ game.listen(game.state, onEvent);
 game.listen(game.achievements, onAchievement);
 
 var achievements = {
-  "5 Blues": [ { name: "destroy", data: {color: "#44f"}, count: 5 } ],
-  "5 Reds": [ { name: "destroy", data: {color: "#f44"}, count: 5 } ],
-  "5 Greens": [ { name: "destroy", data: {color: "#4f4"}, count: 5 } ],
-  "5 Silvers": [ { name: "destroy", data: {color: "#c0c0c0"}, count: 5 } ],
-  "5 Golds": [ { name: "destroy", data: {color: "#ffd700"}, count: 5 } ],
-  "Colorful": [ { name: "a:5 Blues" }, { name: "a:5 Greens" }, { name: "a:5 Reds" } ],
-  "Super Colorful": [ { name: "a:Colorful" }, { name: "a:5 Silvers" }, { name: "a:5 Golds" } ],
+  "Colorful": [ { name: "a:Blue-1" }, { name: "a:Silver-1" }, { name: "a:Green-1" } ],
+  "Super Colorful": [ { name: "a:Colorful" }, { name: "a:Silver-1" }, { name: "a:Gold-1" } ],
   "Quickfire": [ { name: "destroy", within: 1000, count: 3 } ],
   "Quickfire - One of Each": [ { name: "destroy", data: {color: "#4f4"}, within: 1000 }, { name: "destroy", data: {color: "#44f"}, within: 1000 }, { name: "destroy", data: {color: "#f44"}, within: 1000 } ]
 };
+
+[["Blue", "44f"], ["Red", "f44"], ["Green", "4f4"], ["Silver", "c0c0c0"], ["Gold", "#ffd700"]].forEach(function(pair){
+  var color = pair[0], hex = pair[1];
+  var max = (color === "Gold") ? 1 : (color === "Silver") ? 2 : 4;
+  for(var i = 0; i < max; i++) {
+    achievements[color + "-" + (i + 1)] = [ { name: "destroy", data: {color: "#" + hex}, count: 5 * Math.pow(2, i) } ];
+  }
+});
 
 var aList = document.getElementById('achievements');
 
