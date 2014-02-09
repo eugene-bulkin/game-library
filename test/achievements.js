@@ -6,7 +6,7 @@ describe('Achievements', function() {
   game.init();
   var state = game.state;
   var achievements = game.achievements;
-  var o = new Game.Object();
+  var o = new Game.GameObject();
   state.addObject(o);
   describe('Structure', function() {
     it('Should have an addAchievement method', function() {

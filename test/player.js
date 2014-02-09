@@ -1,12 +1,12 @@
 var Game = require('../build/game-library').Game;
 
 var Player = function() {
-  Game.Object.call(this);
+  Game.GameObject.call(this);
 
   this.hp = 100;
   this.mp = 50;
 };
-Game.Utils.extend(Player, Game.Object);
+Game.Utils.extend(Player, Game.GameObject);
 
 Player.prototype.useMP = function(amt) {
   if(amt > this.mp) {

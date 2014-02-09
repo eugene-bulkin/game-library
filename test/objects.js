@@ -10,9 +10,9 @@ describe('Objects', function() {
         expect(p.hp).to.equal(100);
         expect(p.mp).to.equal(50);
       });
-      it('Should have inherited Game.Object methods', function() {
+      it('Should have inherited Game.GameObject methods', function() {
         expect(p).to.respondTo('added');
-        expect(p).to.be.an.instanceof(Game.Object);
+        expect(p).to.be.an.instanceof(Game.GameObject);
       });
       it('Should have inherited Game.Messenger methods', function() {
         expect(p).to.have.property('_id');

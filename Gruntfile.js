@@ -1,21 +1,21 @@
 module.exports = function(grunt) {
-  var fileOrder = grunt.file.readJSON('src/compile-order.json');
+  //var fileOrder = grunt.file.readJSON('src/compile-order.json');
   // Project configuration
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     watch: {
       dev: {
-        files: ['src/*.js', 'test/**/*.js', 'src/compile-order.json'],
+        files: ['src/**/*.ts', 'test/**/*.js', 'src/compile-order.json'],
         tasks: ['build:dev']
       },
       production: {
-        files: ['src/*.js', 'src/compile-order.json'],
+        files: ['src/**/*.ts', 'src/compile-order.json'],
         tasks: ['build:production']
       },
-      doc: {
+      /*doc: {
         files: ['src/*.js', 'README.md'],
         tasks: ['doc']
-      }
+      }*/
     },
     mochaTest: {
       test: {
@@ -28,14 +28,23 @@ module.exports = function(grunt) {
     },
     concat: {
       options: {
-        banner: ';(function( window, undefined ){ \n "use strict";',
-        footer: '\n}(this));'
+        banner: ';(function( window, undefined ){ \n "use strict";\n',
+        footer: '\nwindow.Game = Game; \n}.bind(this)(this));'
       },
       dist: {
-        src: fileOrder.map(function (file) {
-          return "src/" + file + ".js";
-        }),
+        src: 'build/<%= pkg.name %>.js',
         dest: 'build/<%= pkg.name %>.js'
+      }
+    },
+    typescript: {
+      base: {
+        src: ['src/Game/*.ts'],
+        dest: 'build/<%= pkg.name %>.js',
+        options: {
+          target: 'es5',
+          base_path: 'src/Game',
+          sourcemap: true
+        }
       }
     },
     uglify: {
@@ -83,6 +92,7 @@ module.exports = function(grunt) {
     'grunt-contrib-uglify',
     'grunt-contrib-watch',
     'grunt-contrib-jshint',
+    'grunt-typescript',
     'grunt-mocha-test',
     'grunt-jsdoc'
   ];
@@ -93,7 +103,7 @@ module.exports = function(grunt) {
   // Set up tasks
   grunt.registerTask('build', 'Custom build task', function() {
     var args = Array.prototype.slice.call(arguments);
-    var tasks = ['jshint', 'concat'];
+    var tasks = ['typescript', 'concat'];
     // Set flag for whether in production or not
     var inProduction = args.indexOf('production') > -1;
     // uglify code in production only

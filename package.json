@@ -11,6 +11,7 @@
     "grunt-jsdoc": "latest",
     "grunt-contrib-jshint": "latest",
     "grunt-contrib-concat": "latest",
-    "chai-things": "latest"
+    "chai-things": "latest",
+    "grunt-typescript": "~0.2.7"
   }
 }

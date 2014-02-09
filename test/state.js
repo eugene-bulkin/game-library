@@ -20,21 +20,21 @@ describe('Game State', function() {
         expect(state.objects).to.have.property(pid, p, 'Object must be stored in state.objects');
       });
       it('Should notice creation event', function() {
-        // Game.Object.added fires a create method
+        // Game.GameObject.added fires a create method
         expect(state.eventCounters).to.have.property('create')
           .that.have.length(1, 'create event must have been fired once');
       });
-      it("Shouldn't let you add non Game.Object instance", function() {
+      it("Shouldn't let you add non Game.GameObject instance", function() {
         addNonObject = function() {
           state.addObject('asdf');
         };
-        expect(addNonObject).to.throw(Game.Error, Game.Error.ErrorType.NOT_OBJECT);
+        expect(addNonObject).to.throw(Game.GameError, Game.GameError.ErrorType.NOT_OBJECT);
       });
       it("Shouldn't let you add object more than once", function() {
         addObjectTwice = function() {
           state.addObject(p);
         };
-        expect(addObjectTwice).to.throw(Game.Error, Game.Error.ErrorType.ALREADY_ADDED);
+        expect(addObjectTwice).to.throw(Game.GameError, Game.GameError.ErrorType.ALREADY_ADDED);
       });
     });
     describe('Removing objects', function() {
@@ -45,17 +45,17 @@ describe('Game State', function() {
         state.removeObject(p);
         expect(state.objects).to.not.have.property(pid);
       });
-      it("Shouldn't let you remove non Game.Object instance", function() {
+      it("Shouldn't let you remove non Game.GameObject instance", function() {
         removeNonObject = function() {
           state.removeObject('asdf');
         };
-        expect(removeNonObject).to.throw(Game.Error, Game.Error.ErrorType.NOT_OBJECT);
+        expect(removeNonObject).to.throw(Game.GameError, Game.GameError.ErrorType.NOT_OBJECT);
       });
       it("Shouldn't let you remove object type", function() {
         removeObjectTwice = function() {
           state.removeObject(p);
         };
-        expect(removeObjectTwice).to.throw(Game.Error, Game.Error.ErrorType.NOT_ADDED);
+        expect(removeObjectTwice).to.throw(Game.GameError, Game.GameError.ErrorType.NOT_ADDED);
       });
     });
   });
