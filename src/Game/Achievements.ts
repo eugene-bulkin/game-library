@@ -80,13 +80,13 @@ module Game {
     /**
      * Called to check whether a particular requirement is satisfied.
      *
-     * Requirement array format:
+     * Requirement object format:
      *
-     * - `0`: name of event or "a:" + name of achievement
-     * - `1`: event data (must be a subset of the event data)
-     * - `2`: number of occurrences of event
-     * - `3`: time window observed
-     * - `4`: name of event that must have occurred within the time window
+     * - name: name of event or "a:" + name of achievement
+     * - data: event data (must be a subset of the event data)
+     * - count: number of occurrences of event
+     * - within: time window observed
+     * - prereq: name of event that must have occurred within the time window
      *
      * Only the first argument is required. The time window argument is only
      * required if the last argument is specified.
