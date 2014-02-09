@@ -16,7 +16,7 @@ module Game {
      */
     public added() {
       // When the object is added to a state, the object will fire a create event
-      this.fire('create');
+      this.fire('create', this);
     }
   }
 }
