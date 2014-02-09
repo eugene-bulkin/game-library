@@ -67,6 +67,7 @@ var achievements = {
   "5 Blues": [ { name: "destroy", data: {color: "#44f"}, count: 5 } ],
   "5 Reds": [ { name: "destroy", data: {color: "#f44"}, count: 5 } ],
   "5 Greens": [ { name: "destroy", data: {color: "#4f4"}, count: 5 } ],
+  "Colorful": [ { name: "a:5 Blues" }, { name: "a:5 Greens" }, { name: "a:5 Reds" } ],
   "Quickfire": [ { name: "destroy", within: 1000, count: 3 } ]
 };
 
