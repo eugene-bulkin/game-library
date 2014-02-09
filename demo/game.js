@@ -86,6 +86,10 @@ var achievements = {
   }
 });
 
+for(var i = 0; i < 5; i++) {
+  achievements["Total-" + (j + 1)] = [ { name: "destroy", count: 10 * Math.pow(2, j) } ];
+}
+
 var aList = document.getElementById('achievements');
 
 Object.keys(achievements).forEach(function(name) {
