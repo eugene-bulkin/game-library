@@ -78,11 +78,11 @@ var achievements = {
   "Quickfire - One of Each": [ { name: "destroy", data: {color: "#4f4"}, within: 1000 }, { name: "destroy", data: {color: "#44f"}, within: 1000 }, { name: "destroy", data: {color: "#f44"}, within: 1000 } ]
 };
 
-[["Blue", "44f"], ["Red", "f44"], ["Green", "4f4"], ["Silver", "c0c0c0"], ["Gold", "ffd700"]].forEach(function(pair){
+[["Blue", "44f"], ["Red", "f44"], ["Green", "4f4"], ["Silver", "c0c0c0"], ["Gold", "ffd700"]].forEach(function(pair, i){
   var color = pair[0], hex = pair[1];
   var max = (color === "Gold") ? 1 : (color === "Silver") ? 2 : 4;
-  for(var i = 0; i < max; i++) {
-    achievements[color + "-" + (i + 1)] = [ { name: "destroy", data: {color: "#" + hex}, count: 5 * Math.pow(2, i) } ];
+  for(var j = 0; j < 5-i; i++) {
+    achievements[color + "-" + (j + 1)] = [ { name: "destroy", data: {color: "#" + hex}, count: 5 * Math.pow(2, j) } ];
   }
 });
 
