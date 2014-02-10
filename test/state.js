@@ -124,4 +124,39 @@ describe('Game State', function() {
       expect(events).to.have.length(4, 'Damage event not triggered after event handler removed');
     });
   });
+  describe('Score handling', function() {
+    var game = new Game.Application();
+    game.init();
+    var state = game.state;
+    var p = new Player();
+    try {
+      state.addObject(p);
+    } catch(e) {
+      console.log(e);
+      return;
+    }
+    var events = [];
+    game.listen(state, function(e) {
+      events.push(e);
+    });
+    it('Should start with score of zero', function() {
+      expect(state.score).to.equal(0);
+    });
+    it('Should change score on score event firing', function(){
+      p.fire('score', 50);
+      expect(state.score).to.equal(50);
+    });
+    it('Should throw error when score data is not a number', function(){
+      badData = function() {
+        p.fire('score', "asdf");
+      };
+      expect(badData).to.throw(Game.GameError, Game.GameError.ErrorType.BAD_SCORE_DATA);
+    });
+    it('Should fire score change event with correct score', function(){
+      p.fire('score', 50);
+      expect(events[1]).to.exist;
+      expect(events[1]).to.have.property('type', 'scoreChange');
+      expect(events[1]).to.have.property('data', 100);
+    });
+  });
 });

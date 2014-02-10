@@ -32,7 +32,8 @@ module Game {
     static ErrorType = {
       NOT_OBJECT: "You must call this method with a Game.Object instance.",
       ALREADY_ADDED: "Object already added to state.",
-      NOT_ADDED: "Object was not added to state."
+      NOT_ADDED: "Object was not added to state.",
+      BAD_SCORE_DATA: "Score can only change by numerical amounts."
     };
   }
 }

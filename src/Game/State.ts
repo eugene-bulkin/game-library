@@ -12,6 +12,7 @@ module Game {
     public objects: { [x: string]: GameObject }
     public eventCounters: { [x: string]: Counter[] }
     public eventHandlers: { [x: string]: { (e: Event): void; } [] }
+    public score: number;
     /**
      * State controller.
      *
@@ -46,6 +47,17 @@ module Game {
        * @protected
        */
       this.eventHandlers = {}
+
+      this.score = 0;
+    }
+
+    private onScore(e: Event): void {
+      // data must be a number, obviously
+      if(typeof e.data !== 'number') {
+        throw new GameError(GameError.ErrorType.BAD_SCORE_DATA);
+      }
+      this.score += e.data;
+      this.fire('scoreChange', this.score);
     }
 
     /**
@@ -54,7 +66,12 @@ module Game {
      *
      * @param  {Game.Event} e
      */
-    private onEvent(e) {
+    private onEvent(e: Event): void {
+      // On score events, handle elsewhere.
+      if(e.type === 'score') {
+        this.onScore(e);
+        return;
+      }
       // Initialize the counter/handler arrays for this event type
       if(!this.eventCounters.hasOwnProperty(e.type)) {
         this.eventCounters[e.type] = [];
