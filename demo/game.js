@@ -48,6 +48,7 @@ Circle.prototype.added = function(s) {
 
 Circle.prototype.onClick = function(e) {
   this.element.remove();
+  delete this.element;
   var avg = (this.ui.sizeRange[0] + this.ui.sizeRange[1]) / 2;
   var score = this.ui.colors[this.color] * (1.5 - 1/(1 + Math.exp(-(this.radius - avg)/4)));
   score |= 0;
@@ -81,6 +82,8 @@ UI.prototype.onEvent = function(e) {
   if(e.type === 'create') {
     this.circles[e.data.getId()] = e.data;
   } else if(e.type === 'destroy') {
+    this.app.state.removeObject(this.circles[e.data.id]);
+    this.circles[e.data.id].destroy();
     delete this.circles[e.data.id];
   } else if(e.type === 'scoreChange') {
     document.getElementById("score").innerHTML = e.data;
