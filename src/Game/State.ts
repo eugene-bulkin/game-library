@@ -57,7 +57,7 @@ module Game {
         throw new GameError(GameError.ErrorType.BAD_SCORE_DATA);
       }
       this.score += e.data;
-      this.fire('scoreChange', this.score);
+      e.target.fire('scoreChange', this.score);
     }
 
     /**
@@ -67,10 +67,9 @@ module Game {
      * @param  {Game.Event} e
      */
     private onEvent(e: Event): void {
-      // On score events, handle elsewhere.
+      // On score events, execute score callback
       if(e.type === 'score') {
         this.onScore(e);
-        return;
       }
       // Initialize the counter/handler arrays for this event type
       if(!this.eventCounters.hasOwnProperty(e.type)) {

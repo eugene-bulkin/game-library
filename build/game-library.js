@@ -180,13 +180,12 @@ var Game;
                 throw new Game.GameError(Game.GameError.ErrorType.BAD_SCORE_DATA);
             }
             this.score += e.data;
-            this.fire('scoreChange', this.score);
+            e.target.fire('scoreChange', this.score);
         };
 
         State.prototype.onEvent = function (e) {
             if (e.type === 'score') {
                 this.onScore(e);
-                return;
             }
 
             if (!this.eventCounters.hasOwnProperty(e.type)) {
@@ -287,15 +286,44 @@ var Game;
         };
 
         Achievements.prototype.matchData = function (object, data) {
-            return Object.keys(data).every(function (key) {
-                if (typeof data[key] !== typeof object[key]) {
-                    return false;
-                } else if (typeof data[key] === 'object') {
-                    return this.matchData(object[key], data[key]);
-                } else {
-                    return data[key] === object[key];
-                }
+            var relations = ["$gt", "$lt", "$lte", "$gte"];
+            var isRelation = typeof data === 'object' && relations.some(function (k) {
+                return data[k];
             });
+            if (isRelation) {
+                var result = true;
+                relations.forEach(function (k) {
+                    var v = data[k];
+                    if (v) {
+                        switch (k) {
+                            case "$gt":
+                                result = result && object > v;
+                                break;
+                            case "$lt":
+                                result = result && object < v;
+                                break;
+                            case "$gte":
+                                result = result && object >= v;
+                                break;
+                            case "$lte":
+                                result = result && object <= v;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                });
+                return result;
+            }
+            if (typeof data !== typeof object) {
+                return false;
+            } else if (typeof data === 'object') {
+                return Object.keys(data).every(function (key) {
+                    return this.matchData(object[key], data[key]);
+                }, this);
+            } else {
+                return data === object;
+            }
         };
 
         Achievements.prototype.satisfied = function (req) {

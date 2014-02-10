@@ -63,6 +63,12 @@ describe('Achievements', function() {
         requireAchievement: [
           { name: 'a:basicCount' },
           { name: 'asdf5' }
+        ],
+        exactScore: [
+          { name: 'scoreChange', data: 100 }
+        ],
+        atLeastScore: [
+          { name: 'scoreChange', data: { $gt: 150 } }
         ]
       };
       Object.keys(data).forEach(function(name) {
@@ -137,6 +143,20 @@ describe('Achievements', function() {
         expect(achievements.hasAchieved('requireAchievement')).to.be.false;
         o.fire('asdf5');
         expect(achievements.hasAchieved('requireAchievement')).to.be.true;
+      });
+      it('Should work with exact score achievements', function() {
+        expect(achievements.hasAchieved('exactScore')).to.be.false;
+        o.fire('score', 50);
+        expect(achievements.hasAchieved('exactScore')).to.be.false;
+        o.fire('score', 50);
+        expect(achievements.hasAchieved('exactScore')).to.be.true;
+      });
+      it('Should work with at least score achievements', function() {
+        expect(achievements.hasAchieved('atLeastScore')).to.be.false;
+        o.fire('score', 30);
+        expect(achievements.hasAchieved('atLeastScore')).to.be.false;
+        o.fire('score', 30);
+        expect(achievements.hasAchieved('atLeastScore')).to.be.true;
       });
     });
   });
