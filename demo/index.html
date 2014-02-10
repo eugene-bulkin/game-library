@@ -22,7 +22,7 @@
       color: #000;
       font-weight: bold;
     }
-    #score {
+    #scorebox {
       font-size: 1.5em;
       font-weight: bold;
       width: 25%;
@@ -31,12 +31,21 @@
       text-align: center;
       display: block;
     }
+    #multiplier::before {
+      content: "(x";
+    }
+    #multiplier::after {
+      content: ")";
+    }
     </style>
   </head>
   <body>
     <svg height="700" width="100%" id="svg"></svg>
     <ul id="achievements"></ul>
-    <div id="score">0</div>
+    <div id="scorebox">
+      <span id="score">0</span>
+      <span id="multiplier">1</span>
+    </div>
     <script src="game.js"></script>
   </body>
 </html>

@@ -52,6 +52,7 @@ Circle.prototype.onClick = function(e) {
   var avg = (this.ui.sizeRange[0] + this.ui.sizeRange[1]) / 2;
   var score = this.ui.colors[this.color] * (1.5 - 1/(1 + Math.exp(-(this.radius - avg)/4)));
   score |= 0;
+  score *= this.ui.multiplier;
   this.fire('score', Math.max(score, 1));
   this.fire("destroy", { id: this.getId(), color: this.color, size: this.radius });
 };
@@ -74,6 +75,8 @@ function UI() {
   };
   this.sizeRange = [35, 70];
 
+  this.multiplier = 1;
+
   this.circles = {};
   this.interval = null;
 }
@@ -91,6 +94,10 @@ UI.prototype.onEvent = function(e) {
 };
 
 UI.prototype.onAchievement = function(e) {
+  if(e.data.name.match(/^Total/)) {
+    this.multiplier += 0.5;
+    document.getElementById("multiplier").innerHTML = this.multiplier;
+  }
   document.querySelector('li[data-name="' + e.data.name + '"]').classList.add("achieved");
 };
 
