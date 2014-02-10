@@ -97,7 +97,10 @@ UI.prototype.startGame = function() {
     "Super Colorful": [ { name: "a:Colorful" }, { name: "a:Silver-1" }, { name: "a:Gold-1" } ],
     "Mega Colorful": [ { name: "a:Blue-5" }, { name: "a:Red-4" }, { name: "a:Green-3" }, { name: "a:Silver-2" }, { name: "a:Gold-1" } ],
     "Quickfire": [ { name: "destroy", within: 1000, count: 3 } ],
-    "Quickfire - One of Each": [ { name: "destroy", data: {color: "#4f4"}, within: 1000 }, { name: "destroy", data: {color: "#44f"}, within: 1000 }, { name: "destroy", data: {color: "#f44"}, within: 1000 } ]
+    "Quickfire - One of Each": [ { name: "destroy", data: {color: "#4f4"}, within: 1000 }, { name: "destroy", data: {color: "#44f"}, within: 1000 }, { name: "destroy", data: {color: "#f44"}, within: 1000 } ],
+    "Score-1": [ { name: "scoreChange", data: { $gte: 500 } } ],
+    "Score-2": [ { name: "scoreChange", data: { $gte: 1500 } } ],
+    "Score-3": [ { name: "scoreChange", data: { $gte: 3500 } } ]
   };
 
   [["Blue", "44f"], ["Red", "f44"], ["Green", "4f4"], ["Silver", "c0c0c0"], ["Gold", "ffd700"]].forEach(function(pair, i){
