@@ -85,7 +85,7 @@ var achievements = {
   }
 });
 
-for(var i = 0; i < 5; i++) {
+for(var i = 0; i < 7; i++) {
   achievements["Total-" + (i + 1)] = [ { name: "destroy", count: 10 * Math.pow(2, i) } ];
 }
 
@@ -106,8 +106,8 @@ var colors = {
   "#44f": 5,
   "#f44": 10,
   "#4f4": 20,
-  "#c0c0c0": 65,
-  "#ffd700": 130
+  "#c0c0c0": 60,
+  "#ffd700": 120
 };
 var colorNames = Object.keys(colors);
 var freqs = colorNames.map(function(k){ return 1 / colors[k]; });
@@ -127,6 +127,6 @@ var interval = setInterval(function() {
   if(Object.keys(circles).length > 15) {
     return;
   }
-  var c = new Circle(randRange(25, 60), roulette());
+  var c = new Circle(randRange(35, 70), roulette());
   game.state.addObject(c, s);
-}, 750);
+}, 625);
