@@ -125,9 +125,9 @@ function roulette() {
 }
 
 var interval = setInterval(function() {
-  if(Object.keys(circles).length > 15) {
+  if(Object.keys(circles).length > 20) {
     return;
   }
   var c = new Circle(randRange(35, 70), roulette());
   game.state.addObject(c, s);
-}, 625);
+}, 500);
