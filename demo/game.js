@@ -74,6 +74,7 @@ game.listen(game.achievements, onAchievement);
 var achievements = {
   "Colorful": [ { name: "a:Blue-1" }, { name: "a:Red-1" }, { name: "a:Green-1" } ],
   "Super Colorful": [ { name: "a:Colorful" }, { name: "a:Silver-1" }, { name: "a:Gold-1" } ],
+  "Mega Colorful": [ { name: "a:Blue-5" }, { name: "a:Red-4" }, { name: "a:Green-3" }, { name: "a:Silver-2" }, { name: "a:Gold-1" } ],
   "Quickfire": [ { name: "destroy", within: 1000, count: 3 } ],
   "Quickfire - One of Each": [ { name: "destroy", data: {color: "#4f4"}, within: 1000 }, { name: "destroy", data: {color: "#44f"}, within: 1000 }, { name: "destroy", data: {color: "#f44"}, within: 1000 } ]
 };
