@@ -7,21 +7,13 @@ function randChoice(list) {
   return list[Math.random() * list.length | 0];
 }
 
-var COLORS = {
-  "#44f": 5,
-  "#f44": 10,
-  "#4f4": 20,
-  "#c0c0c0": 60,
-  "#ffd700": 120
-};
-var SIZE_RANGE = [35, 70];
-
 // circle object
-function Circle(radius, color) {
+function Circle(radius, color, ui) {
   Game.GameObject.call(this);
 
   this.radius = radius || 10;
   this.color = color || "#08f";
+  this.ui = ui;
 }
 Game.Utils.extend(Circle, Game.GameObject);
 
@@ -56,8 +48,8 @@ Circle.prototype.added = function(s) {
 
 Circle.prototype.onClick = function(e) {
   this.element.remove();
-  var avg = (SIZE_RANGE[0] + SIZE_RANGE[1]) / 2;
-  var score = COLORS[this.color] * (1.5 - 1/(1 + Math.exp(-(this.radius - avg)/4)));
+  var avg = (this.ui.sizeRange[0] + this.ui.sizeRange[1]) / 2;
+  var score = this.ui.colors[this.color] * (1.5 - 1/(1 + Math.exp(-(this.radius - avg)/4)));
   score |= 0;
   this.fire('score', Math.max(score, 1));
   this.fire("destroy", { id: this.getId(), color: this.color, size: this.radius });
@@ -71,6 +63,15 @@ function UI() {
   this.app.init();
   this.app.listen(this.app.state, this.onEvent.bind(this));
   this.app.listen(this.app.achievements, this.onAchievement.bind(this));
+
+  this.colors = {
+    "#44f": 5,
+    "#f44": 10,
+    "#4f4": 20,
+    "#c0c0c0": 60,
+    "#ffd700": 120
+  };
+  this.sizeRange = [35, 70];
 
   this.circles = {};
   this.interval = null;
@@ -127,8 +128,8 @@ UI.prototype.startGame = function() {
     aList.appendChild(li);
   }, this);
   // initialize object appearances
-  var colorNames = Object.keys(COLORS);
-  var freqs = colorNames.map(function(k){ return 1 / COLORS[k]; });
+  var colorNames = Object.keys(this.colors);
+  var freqs = colorNames.map(function(k){ return 1 / this.colors[k]; }, this);
   var total = freqs.reduce(function(a,b){ return a+b; }, 0);
 
   function roulette() {
@@ -145,7 +146,7 @@ UI.prototype.startGame = function() {
     if(Object.keys(this.circles).length > 20) {
       return;
     }
-    var c = new Circle(randRange(SIZE_RANGE[0], SIZE_RANGE[1]), roulette());
+    var c = new Circle(randRange(this.sizeRange[0], this.sizeRange[1]), roulette(), this);
     this.app.state.addObject(c, this.snap);
   }.bind(this), 500);
 };
