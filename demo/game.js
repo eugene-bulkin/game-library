@@ -57,7 +57,7 @@ Circle.prototype.added = function(s) {
 Circle.prototype.onClick = function(e) {
   this.element.remove();
   var avg = (SIZE_RANGE[0] + SIZE_RANGE[1]) / 2;
-  var score = 2 * COLORS[this.color] * (1 - 1/(1 + Math.exp(-(this.radius - avg)/5)));
+  var score = 2 * COLORS[this.color] * (1 - 1/(1 + Math.exp(-(this.radius - avg)/10)));
   score |= 0;
   this.fire('score', Math.max(score, 1));
   this.fire("destroy", { id: this.getId(), color: this.color, size: this.radius });
