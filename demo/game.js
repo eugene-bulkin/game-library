@@ -1,3 +1,4 @@
+// utility functions
 function randRange(min, max) {
   return (Math.random() * (max - min + 1) + min) | 0;
 }
@@ -6,6 +7,7 @@ function randChoice(list) {
   return list[Math.random() * list.length | 0];
 }
 
+// circle object
 function Circle(radius, color) {
   Game.GameObject.call(this);
 
@@ -48,86 +50,94 @@ Circle.prototype.onClick = function(e) {
   this.fire("destroy", { id: this.getId(), color: this.color, size: this.radius });
 };
 
-var circles = {};
+// UI class
+function UI() {
+  this.snap = new Snap("#svg");
 
-function onEvent(e) {
+  this.app = new Game.Application();
+  this.app.init();
+  this.app.listen(this.app.state, this.onEvent.bind(this));
+  this.app.listen(this.app.achievements, this.onAchievement.bind(this));
+
+  this.circles = {};
+  this.interval = null;
+}
+
+UI.prototype.onEvent = function(e) {
   if(e.type === 'create') {
-    circles[e.data.getId()] = e.data;
+    this.circles[e.data.getId()] = e.data;
   } else if(e.type === 'destroy') {
-    delete circles[e.data.id];
+    delete this.circles[e.data.id];
   }
-}
+};
 
-function onAchievement(e) {
+UI.prototype.onAchievement = function(e) {
   document.querySelector('li[data-name="' + e.data.name + '"]').classList.add("achieved");
-}
-
-var s = new Snap("#svg");
-
-var game = new Game.Application();
-game.init();
-
-game.listen(game.state, onEvent);
-
-game.listen(game.achievements, onAchievement);
-
-var achievements = {
-  "Colorful": [ { name: "a:Blue-1" }, { name: "a:Red-1" }, { name: "a:Green-1" } ],
-  "Super Colorful": [ { name: "a:Colorful" }, { name: "a:Silver-1" }, { name: "a:Gold-1" } ],
-  "Mega Colorful": [ { name: "a:Blue-5" }, { name: "a:Red-4" }, { name: "a:Green-3" }, { name: "a:Silver-2" }, { name: "a:Gold-1" } ],
-  "Quickfire": [ { name: "destroy", within: 1000, count: 3 } ],
-  "Quickfire - One of Each": [ { name: "destroy", data: {color: "#4f4"}, within: 1000 }, { name: "destroy", data: {color: "#44f"}, within: 1000 }, { name: "destroy", data: {color: "#f44"}, within: 1000 } ]
 };
 
-[["Blue", "44f"], ["Red", "f44"], ["Green", "4f4"], ["Silver", "c0c0c0"], ["Gold", "ffd700"]].forEach(function(pair, i){
-  var color = pair[0], hex = pair[1];
-  for(var j = 0; j < 5-i; j++) {
-    achievements[color + "-" + (j + 1)] = [ { name: "destroy", data: {color: "#" + hex}, count: 5 * Math.pow(2, j) } ];
+UI.prototype.startGame = function() {
+  // initialize achievements
+  var achievements = {
+    "Colorful": [ { name: "a:Blue-1" }, { name: "a:Red-1" }, { name: "a:Green-1" } ],
+    "Super Colorful": [ { name: "a:Colorful" }, { name: "a:Silver-1" }, { name: "a:Gold-1" } ],
+    "Mega Colorful": [ { name: "a:Blue-5" }, { name: "a:Red-4" }, { name: "a:Green-3" }, { name: "a:Silver-2" }, { name: "a:Gold-1" } ],
+    "Quickfire": [ { name: "destroy", within: 1000, count: 3 } ],
+    "Quickfire - One of Each": [ { name: "destroy", data: {color: "#4f4"}, within: 1000 }, { name: "destroy", data: {color: "#44f"}, within: 1000 }, { name: "destroy", data: {color: "#f44"}, within: 1000 } ]
+  };
+
+  [["Blue", "44f"], ["Red", "f44"], ["Green", "4f4"], ["Silver", "c0c0c0"], ["Gold", "ffd700"]].forEach(function(pair, i){
+    var color = pair[0], hex = pair[1];
+    for(var j = 0; j < 5-i; j++) {
+      achievements[color + "-" + (j + 1)] = [ { name: "destroy", data: {color: "#" + hex}, count: 5 * Math.pow(2, j) } ];
+    }
+  });
+
+  for(var i = 0; i < 7; i++) {
+    achievements["Total-" + (i + 1)] = [ { name: "destroy", count: 10 * Math.pow(2, i) } ];
   }
-});
 
-for(var i = 0; i < 7; i++) {
-  achievements["Total-" + (i + 1)] = [ { name: "destroy", count: 10 * Math.pow(2, i) } ];
-}
+  var aList = document.getElementById('achievements');
 
-var aList = document.getElementById('achievements');
+  Object.keys(achievements).forEach(function(name) {
+    var reqs = achievements[name];
+    this.app.achievements.addAchievement(name, reqs);
 
-Object.keys(achievements).forEach(function(name) {
-  var reqs = achievements[name];
-  game.achievements.addAchievement(name, reqs);
+    var li = document.createElement('li');
+    li.setAttribute('data-name', name);
+    li.innerHTML = name;
 
-  var li = document.createElement('li');
-  li.setAttribute('data-name', name);
-  li.innerHTML = name;
+    aList.appendChild(li);
+  }, this);
+  // initialize object appearances
+  var colors = {
+    "#44f": 5,
+    "#f44": 10,
+    "#4f4": 20,
+    "#c0c0c0": 60,
+    "#ffd700": 120
+  };
+  var colorNames = Object.keys(colors);
+  var freqs = colorNames.map(function(k){ return 1 / colors[k]; });
+  var total = freqs.reduce(function(a,b){ return a+b; }, 0);
 
-  aList.appendChild(li);
-});
+  function roulette() {
+    var selection = Math.random() * total;
+    var running = 0, i = 0;
+    while(selection > running) {
+      running += freqs[i];
+      i++;
+    }
+    return colorNames[i - 1];
+  }
 
-var colors = {
-  "#44f": 5,
-  "#f44": 10,
-  "#4f4": 20,
-  "#c0c0c0": 60,
-  "#ffd700": 120
+  this.interval = setInterval(function() {
+    if(Object.keys(this.circles).length > 20) {
+      return;
+    }
+    var c = new Circle(randRange(35, 70), roulette());
+    this.app.state.addObject(c, this.snap);
+  }.bind(this), 500);
 };
-var colorNames = Object.keys(colors);
-var freqs = colorNames.map(function(k){ return 1 / colors[k]; });
-var total = freqs.reduce(function(a,b){ return a+b; }, 0);
 
-function roulette() {
-  var selection = Math.random() * total;
-  var running = 0, i = 0;
-  while(selection > running) {
-    running += freqs[i];
-    i++;
-  }
-  return colorNames[i - 1];
-}
-
-var interval = setInterval(function() {
-  if(Object.keys(circles).length > 20) {
-    return;
-  }
-  var c = new Circle(randRange(35, 70), roulette());
-  game.state.addObject(c, s);
-}, 500);
+var ui = new UI();
+ui.startGame();
