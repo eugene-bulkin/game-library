@@ -7,6 +7,15 @@ function randChoice(list) {
   return list[Math.random() * list.length | 0];
 }
 
+var COLORS = {
+  "#44f": 5,
+  "#f44": 10,
+  "#4f4": 20,
+  "#c0c0c0": 60,
+  "#ffd700": 120
+};
+var SIZE_RANGE = [35, 70];
+
 // circle object
 function Circle(radius, color) {
   Game.GameObject.call(this);
@@ -47,6 +56,10 @@ Circle.prototype.added = function(s) {
 
 Circle.prototype.onClick = function(e) {
   this.element.remove();
+  var avg = (SIZE_RANGE[0] + SIZE_RANGE[1]) / 2;
+  var score = 2 * COLORS[this.color] * (1 - 1/(1 + Math.exp(-(this.radius - avg)/5)));
+  score |= 0;
+  this.fire('score', Math.max(score, 1));
   this.fire("destroy", { id: this.getId(), color: this.color, size: this.radius });
 };
 
@@ -68,6 +81,8 @@ UI.prototype.onEvent = function(e) {
     this.circles[e.data.getId()] = e.data;
   } else if(e.type === 'destroy') {
     delete this.circles[e.data.id];
+  } else if(e.type === 'scoreChange') {
+    document.getElementById("score").innerHTML = e.data;
   }
 };
 
@@ -109,15 +124,8 @@ UI.prototype.startGame = function() {
     aList.appendChild(li);
   }, this);
   // initialize object appearances
-  var colors = {
-    "#44f": 5,
-    "#f44": 10,
-    "#4f4": 20,
-    "#c0c0c0": 60,
-    "#ffd700": 120
-  };
-  var colorNames = Object.keys(colors);
-  var freqs = colorNames.map(function(k){ return 1 / colors[k]; });
+  var colorNames = Object.keys(COLORS);
+  var freqs = colorNames.map(function(k){ return 1 / COLORS[k]; });
   var total = freqs.reduce(function(a,b){ return a+b; }, 0);
 
   function roulette() {
@@ -134,7 +142,7 @@ UI.prototype.startGame = function() {
     if(Object.keys(this.circles).length > 20) {
       return;
     }
-    var c = new Circle(randRange(35, 70), roulette());
+    var c = new Circle(randRange(SIZE_RANGE[0], SIZE_RANGE[1]), roulette());
     this.app.state.addObject(c, this.snap);
   }.bind(this), 500);
 };

@@ -153,7 +153,8 @@ var Game;
         GameError.ErrorType = {
             NOT_OBJECT: "You must call this method with a Game.Object instance.",
             ALREADY_ADDED: "Object already added to state.",
-            NOT_ADDED: "Object was not added to state."
+            NOT_ADDED: "Object was not added to state.",
+            BAD_SCORE_DATA: "Score can only change by numerical amounts."
         };
         return GameError;
     })();
@@ -171,8 +172,23 @@ var Game;
             this.eventCounters = {};
 
             this.eventHandlers = {};
+
+            this.score = 0;
         }
+        State.prototype.onScore = function (e) {
+            if (typeof e.data !== 'number') {
+                throw new Game.GameError(Game.GameError.ErrorType.BAD_SCORE_DATA);
+            }
+            this.score += e.data;
+            this.fire('scoreChange', this.score);
+        };
+
         State.prototype.onEvent = function (e) {
+            if (e.type === 'score') {
+                this.onScore(e);
+                return;
+            }
+
             if (!this.eventCounters.hasOwnProperty(e.type)) {
                 this.eventCounters[e.type] = [];
             }
