@@ -1,16 +1,8 @@
 ///<reference path="./State.ts" />
-///<reference path="./Messenger.ts" />
+///<reference path="./StateTracker.ts" />
 
 module Game {
-  export interface Requirement {
-    name: string;
-    data?: any;
-    count?: number;
-    within?: number;
-    prereq?: string;
-  }
-  export class Achievements extends Messenger {
-    public state: State;
+  export class Achievements extends StateTracker {
     public achievements: { [x: string]: Requirement[] };
     public achieved: { [x: string]: Requirement[] };
 
@@ -21,14 +13,7 @@ module Game {
      * @extends Game.Messenger
      */
     constructor(state: State) {
-      super();
-
-      /**
-       * @type {Game.State}
-       * @protected
-       */
-      this.state = state;
-
+      super(state);
       /**
        * Internal achievements hash. Keys are the names of the achievements,
        * and the array is the data describing them. This hash only contains
@@ -46,15 +31,6 @@ module Game {
        * @protected
        */
       this.achieved = {};
-
-      this.init();
-    }
-
-    /**
-     * Init function. Called from constructor to listen to the state.
-     */
-    public init(): void {
-      this.listen(this.state, this.onEvent);
     }
 
     /**
@@ -134,10 +110,10 @@ module Game {
       if(achMatch) {
         return this.hasAchieved(achMatch[1]);
       }
-      if(!this.state.eventCounters.hasOwnProperty(req.name)) {
+      if(!this.eventCounters.hasOwnProperty(req.name)) {
         return false;
       }
-      var counter: Counter[] = this.state.eventCounters[req.name];
+      var counter: Counter[] = this.eventCounters[req.name];
       // set default count
       var count = (req.count && req.count > 0) ? req.count : 1;
       // filter out events that don't match the required data
@@ -151,10 +127,10 @@ module Game {
       if(req.within) {
         var origin = new Date();
         if(req.prereq) {
-          if(!this.state.eventCounters[req.prereq]) {
+          if(!this.eventCounters[req.prereq]) {
             return false;
           }
-          origin = this.state.eventCounters[req.prereq].slice(-1)[0].time;
+          origin = this.eventCounters[req.prereq].slice(-1)[0].time;
         }
         counter = counter.filter(function(e: Counter) {
           return (origin.getTime() - e.time.getTime() <= req.within);
@@ -168,7 +144,8 @@ module Game {
      *
      * @param  {Game.Event} e
      */
-    private onEvent(e) {
+    public onEvent(e: Event): void {
+      super.onEvent(e);
       Object.keys(this.achievements).forEach(function(name) {
         var reqs = this.achievements[name];
         var achieved = reqs.every(this.satisfied, this);

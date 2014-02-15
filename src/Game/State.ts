@@ -9,9 +9,9 @@ module Game {
     data: any;
   }
   export class State extends Messenger {
-    public objects: { [x: string]: GameObject }
-    public eventCounters: { [x: string]: Counter[] }
-    public eventHandlers: { [x: string]: { (e: Event): void; } [] }
+    public objects: { [x: string]: GameObject };
+    public eventCounters: { [x: string]: Counter[] };
+    public eventHandlers: { [x: string]: { (e: Event): void; } [] };
     public score: number;
     /**
      * State controller.
@@ -27,7 +27,7 @@ module Game {
        * @type {object.<string, Game.GameObject>}
        * @protected
        */
-      this.objects = {}
+      this.objects = {};
 
       /**
        * Set up a hash to count instances of events occurring. The keys are the
@@ -37,7 +37,7 @@ module Game {
        * @type {object.<string, Date[]>}
        * @protected
        */
-      this.eventCounters = {}
+      this.eventCounters = {};
 
       /**
        * Set up a hash for specific event handlers, because the state will at
@@ -46,7 +46,7 @@ module Game {
        * @type {object.<string, function[]>}
        * @protected
        */
-      this.eventHandlers = {}
+      this.eventHandlers = {};
 
       this.score = 0;
     }

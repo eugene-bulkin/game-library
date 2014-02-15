@@ -268,23 +268,46 @@ var Game;
 })(Game || (Game = {}));
 var Game;
 (function (Game) {
-    var Achievements = (function (_super) {
-        __extends(Achievements, _super);
-        function Achievements(state) {
+    var StateTracker = (function (_super) {
+        __extends(StateTracker, _super);
+        function StateTracker(state) {
             _super.call(this);
 
             this.state = state;
 
-            this.achievements = {};
-
-            this.achieved = {};
+            this.eventCounters = {};
 
             this.init();
         }
-        Achievements.prototype.init = function () {
+        StateTracker.prototype.init = function () {
             this.listen(this.state, this.onEvent);
         };
 
+        StateTracker.prototype.onEvent = function (e) {
+            if (!this.eventCounters.hasOwnProperty(e.type)) {
+                this.eventCounters[e.type] = [];
+            }
+
+            this.eventCounters[e.type].push({
+                time: new Date(),
+                data: e.data
+            });
+        };
+        return StateTracker;
+    })(Game.Messenger);
+    Game.StateTracker = StateTracker;
+})(Game || (Game = {}));
+var Game;
+(function (Game) {
+    var Achievements = (function (_super) {
+        __extends(Achievements, _super);
+        function Achievements(state) {
+            _super.call(this, state);
+
+            this.achievements = {};
+
+            this.achieved = {};
+        }
         Achievements.prototype.matchData = function (object, data) {
             var relations = ["$gt", "$lt", "$lte", "$gte"];
             var isRelation = typeof data === 'object' && relations.some(function (k) {
@@ -338,10 +361,10 @@ var Game;
             if (achMatch) {
                 return this.hasAchieved(achMatch[1]);
             }
-            if (!this.state.eventCounters.hasOwnProperty(req.name)) {
+            if (!this.eventCounters.hasOwnProperty(req.name)) {
                 return false;
             }
-            var counter = this.state.eventCounters[req.name];
+            var counter = this.eventCounters[req.name];
 
             var count = (req.count && req.count > 0) ? req.count : 1;
 
@@ -354,10 +377,10 @@ var Game;
             if (req.within) {
                 var origin = new Date();
                 if (req.prereq) {
-                    if (!this.state.eventCounters[req.prereq]) {
+                    if (!this.eventCounters[req.prereq]) {
                         return false;
                     }
-                    origin = this.state.eventCounters[req.prereq].slice(-1)[0].time;
+                    origin = this.eventCounters[req.prereq].slice(-1)[0].time;
                 }
                 counter = counter.filter(function (e) {
                     return (origin.getTime() - e.time.getTime() <= req.within);
@@ -367,6 +390,7 @@ var Game;
         };
 
         Achievements.prototype.onEvent = function (e) {
+            _super.prototype.onEvent.call(this, e);
             Object.keys(this.achievements).forEach(function (name) {
                 var reqs = this.achievements[name];
                 var achieved = reqs.every(this.satisfied, this);
@@ -387,7 +411,7 @@ var Game;
             this.achievements[name] = requirements;
         };
         return Achievements;
-    })(Game.Messenger);
+    })(Game.StateTracker);
     Game.Achievements = Achievements;
 })(Game || (Game = {}));
 var Game;
