@@ -1,3 +1,4 @@
+///<reference path="./Utils.ts" />
 ///<reference path="./State.ts" />
 ///<reference path="./StateTracker.ts" />
 
@@ -31,53 +32,6 @@ module Game {
        * @protected
        */
       this.achieved = {};
-    }
-
-    /**
-     * Check whether data is a subset of object
-     *
-     * @param  {object} object
-     * @param  {object} data
-     *
-     * @return {Boolean}
-     */
-    private matchData(object: any, data: any): boolean {
-      var relations = ["$gt", "$lt", "$lte", "$gte"];
-      var isRelation = typeof data === 'object' && relations.some(function(k){ return data[k]; });
-      if(isRelation) {
-        var result = true;
-        relations.forEach(function(k){
-          var v = data[k];
-          if(v) {
-            switch(k) {
-              case "$gt":
-                result = result && object > v;
-                break;
-              case "$lt":
-                result = result && object < v;
-                break;
-              case "$gte":
-                result = result && object >= v;
-                break;
-              case "$lte":
-                result = result && object <= v;
-                break;
-              default:
-                break;
-            }
-          }
-        });
-        return result;
-      }
-      if(typeof data !== typeof object) {
-        return false;
-      } else if(typeof data === 'object') {
-        return Object.keys(data).every(function(key) {
-          return this.matchData(object[key], data[key]);
-        }, this);
-      } else {
-        return data === object;
-      }
     }
 
     /**
@@ -119,7 +73,7 @@ module Game {
       // filter out events that don't match the required data
       if(req.data) {
         counter = counter.filter(function(e: Counter) {
-          return this.matchData(e.data, req.data);
+          return Utils.matchData(e.data, req.data);
         }, this);
       }
       // if there's a time, filter out all events that occurred before the last
