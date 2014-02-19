@@ -2,18 +2,6 @@
  "use strict";
 var Game;
 (function (Game) {
-    var Event = (function () {
-        function Event(type, data, target) {
-            this.type = type;
-            this.data = data;
-            this.target = target;
-        }
-        return Event;
-    })();
-    Game.Event = Event;
-})(Game || (Game = {}));
-var Game;
-(function (Game) {
     var Utils = (function () {
         function Utils() {
         }
@@ -30,9 +18,62 @@ var Game;
             }
             child.prototype = Object.create(parent.prototype);
         };
+
+        Utils.matchData = function (object, data) {
+            var relations = ["$gt", "$lt", "$lte", "$gte"];
+            var isRelation = typeof data === 'object' && relations.some(function (k) {
+                return data[k];
+            });
+            if (isRelation) {
+                var result = true;
+                relations.forEach(function (k) {
+                    var v = data[k];
+                    if (v) {
+                        switch (k) {
+                            case "$gt":
+                                result = result && object > v;
+                                break;
+                            case "$lt":
+                                result = result && object < v;
+                                break;
+                            case "$gte":
+                                result = result && object >= v;
+                                break;
+                            case "$lte":
+                                result = result && object <= v;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                });
+                return result;
+            }
+            if (typeof data !== typeof object) {
+                return false;
+            } else if (typeof data === 'object') {
+                return Object.keys(data).every(function (key) {
+                    return Utils.matchData(object[key], data[key]);
+                }, this);
+            } else {
+                return data === object;
+            }
+        };
         return Utils;
     })();
     Game.Utils = Utils;
+})(Game || (Game = {}));
+var Game;
+(function (Game) {
+    var Event = (function () {
+        function Event(type, data, target) {
+            this.type = type;
+            this.data = data;
+            this.target = target;
+        }
+        return Event;
+    })();
+    Game.Event = Event;
 })(Game || (Game = {}));
 var Game;
 (function (Game) {
@@ -142,8 +183,15 @@ var Game;
 (function (Game) {
     var GameError = (function () {
         function GameError(message) {
+            var data = [];
+            for (var _i = 0; _i < (arguments.length - 1); _i++) {
+                data[_i] = arguments[_i + 1];
+            }
             this.name = "GameError";
-            this.message = message;
+            message = message || "";
+            this.message = message.replace(/{{(\d+)}}/g, function (match, id) {
+                return data[id - 1] || "";
+            });
             this.stack = (new Error()).stack;
         }
         GameError.prototype.toString = function () {
@@ -154,7 +202,10 @@ var Game;
             NOT_OBJECT: "You must call this method with a Game.Object instance.",
             ALREADY_ADDED: "Object already added to state.",
             NOT_ADDED: "Object was not added to state.",
-            BAD_SCORE_DATA: "Score can only change by numerical amounts."
+            BAD_SCORE_DATA: "Score can only change by numerical amounts.",
+            LEVEL_NOT_EXIST: "Specified level {{1}} does not exist.",
+            REMOVE_CUR_LEVEL: "Cannot remove current level.",
+            ADVANCE_CUR_LEVEL: "Cannot advance to current level."
         };
         return GameError;
     })();
@@ -308,47 +359,6 @@ var Game;
 
             this.achieved = {};
         }
-        Achievements.prototype.matchData = function (object, data) {
-            var relations = ["$gt", "$lt", "$lte", "$gte"];
-            var isRelation = typeof data === 'object' && relations.some(function (k) {
-                return data[k];
-            });
-            if (isRelation) {
-                var result = true;
-                relations.forEach(function (k) {
-                    var v = data[k];
-                    if (v) {
-                        switch (k) {
-                            case "$gt":
-                                result = result && object > v;
-                                break;
-                            case "$lt":
-                                result = result && object < v;
-                                break;
-                            case "$gte":
-                                result = result && object >= v;
-                                break;
-                            case "$lte":
-                                result = result && object <= v;
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                });
-                return result;
-            }
-            if (typeof data !== typeof object) {
-                return false;
-            } else if (typeof data === 'object') {
-                return Object.keys(data).every(function (key) {
-                    return this.matchData(object[key], data[key]);
-                }, this);
-            } else {
-                return data === object;
-            }
-        };
-
         Achievements.prototype.satisfied = function (req) {
             if (!req.name) {
                 return false;
@@ -370,7 +380,7 @@ var Game;
 
             if (req.data) {
                 counter = counter.filter(function (e) {
-                    return this.matchData(e.data, req.data);
+                    return Game.Utils.matchData(e.data, req.data);
                 }, this);
             }
 
@@ -429,6 +439,114 @@ var Game;
         return Application;
     })(Game.Messenger);
     Game.Application = Application;
+})(Game || (Game = {}));
+var Game;
+(function (Game) {
+    var Plot = (function (_super) {
+        __extends(Plot, _super);
+        function Plot(state) {
+            _super.call(this, state);
+            this.currentLevel = 0;
+        }
+        Plot.prototype.addLevel = function (data, goals, effects) {
+            this.levels.push({
+                data: data,
+                goals: goals || [],
+                effects: effects || []
+            });
+            return this.levels.length - 1;
+        };
+
+        Plot.prototype.removeLevel = function (id) {
+            if (id < 0 || id >= this.levels.length) {
+                throw new Game.GameError(Game.GameError.ErrorType.LEVEL_NOT_EXIST, id);
+            }
+            if (id === this.currentLevel) {
+                throw new Game.GameError(Game.GameError.ErrorType.REMOVE_CUR_LEVEL);
+            }
+            this.levels.splice(id, 1);
+
+            if (id < this.currentLevel) {
+                this.currentLevel -= 1;
+            }
+        };
+
+        Plot.prototype.addGoals = function (goals, id) {
+            if (id < 0 || id >= this.levels.length) {
+                throw new Game.GameError(Game.GameError.ErrorType.LEVEL_NOT_EXIST, id);
+            }
+            id = id || this.currentLevel;
+            this.levels[id].goals.push.apply(this.levels[id].goals, goals);
+        };
+
+        Plot.prototype.addEffects = function (effects, id) {
+            if (id < 0 || id >= this.levels.length) {
+                throw new Game.GameError(Game.GameError.ErrorType.LEVEL_NOT_EXIST, id);
+            }
+            id = id || this.currentLevel;
+            this.levels[id].effects.push.apply(this.levels[id].effects, effects);
+        };
+
+        Plot.prototype.advance = function (id) {
+            id = id || this.currentLevel + 1;
+            if (id < 0 || id >= this.levels.length) {
+                throw new Game.GameError(Game.GameError.ErrorType.LEVEL_NOT_EXIST, id);
+            }
+            if (id === this.currentLevel) {
+                throw new Game.GameError(Game.GameError.ErrorType.ADVANCE_CUR_LEVEL);
+            }
+            this.currentLevel = id;
+            this.fire('advance', this.currentLevel);
+        };
+
+        Plot.prototype.satisfied = function (req) {
+            if (!req.name) {
+                return false;
+            }
+
+            if (req.prereq && !req.within) {
+                return false;
+            }
+            if (!this.eventCounters.hasOwnProperty(req.name)) {
+                return false;
+            }
+            var counter = this.eventCounters[req.name];
+
+            var count = (req.count && req.count > 0) ? req.count : 1;
+
+            if (req.data) {
+                counter = counter.filter(function (e) {
+                    return Game.Utils.matchData(e.data, req.data);
+                }, this);
+            }
+
+            if (req.within) {
+                var origin = new Date();
+                if (req.prereq) {
+                    if (!this.eventCounters[req.prereq]) {
+                        return false;
+                    }
+                    origin = this.eventCounters[req.prereq].slice(-1)[0].time;
+                }
+                counter = counter.filter(function (e) {
+                    return (origin.getTime() - e.time.getTime() <= req.within);
+                });
+            }
+            return (counter.length >= count);
+        };
+
+        Plot.prototype.onEvent = function (e) {
+            _super.prototype.onEvent.call(this, e);
+
+            var goalsAchieved = this.levels[this.currentLevel].goals.every(this.satisfied, this);
+            if (goalsAchieved) {
+                this.fire('levelCompleted', this.currentLevel);
+                this.eventCounters = {};
+            }
+        };
+        return Plot;
+    })(Game.StateTracker);
+    Game.Plot = Plot;
 })(Game || (Game = {}));
 //# sourceMappingURL=game-library.js.map
 
